@@ -1,0 +1,240 @@
+#!/usr/bin/env python3
+"""
+jasecibench grade — run hidden grading locally without opening a PR.
+
+Dispatches the vault's grade-submission workflow (pr_number=0 / log-only
+mode), polls until complete, and prints the score table to your terminal.
+Your candidate code must be pushed to GitHub — the vault checks it out at
+the given SHA exactly as it would during a real PR evaluation.
+
+Usage
+-----
+    JASECIBENCH_EVAL_TOKEN=<pat> ./scripts/grade [options]
+
+Options
+    --repo  OWNER/REPO   GitHub repo containing your candidate code.
+                         Default: auto-detected from git remote origin.
+    --sha   SHA          Commit SHA to grade.
+                         Default: your current git HEAD.
+
+Required environment variable
+    JASECIBENCH_EVAL_TOKEN
+        Fine-grained PAT scoped to JaseciBench-vault with:
+          - Actions: write   (to trigger workflow_dispatch)
+          - Actions: read    (to poll run status + fetch logs)
+        Ask a maintainer for one — do NOT commit this token anywhere.
+
+Examples
+    # Grade your current HEAD (code must be pushed first):
+    git push origin my-branch
+    JASECIBENCH_EVAL_TOKEN=ghp_xxx ./scripts/grade
+
+    # Grade a specific SHA on a fork:
+    JASECIBENCH_EVAL_TOKEN=ghp_xxx ./scripts/grade \\
+        --repo YourOrg/JaseciBench \\
+        --sha  abc1234
+"""
+
+import argparse
+import datetime
+import json
+import os
+import subprocess
+import sys
+import time
+
+VAULT_REPO  = "Thamirawaran/JaseciBench-vault"
+WORKFLOW    = "grade-submission.yml"
+POLL_SECS   = 8      # seconds between status polls
+MAX_POLLS   = 75     # 75 × 8s = 10 minutes max
+FIND_RETRIES = 12    # retries finding the new run after dispatch
+
+
+def _run(cmd, env=None, check=True):
+    return subprocess.run(
+        cmd,
+        capture_output=True,
+        text=True,
+        check=check,
+        env=env or os.environ,
+    )
+
+
+def _gh(args, token, check=True):
+    env = {**os.environ, "GH_TOKEN": token}
+    return _run(["gh"] + args, env=env, check=check)
+
+
+def _git_sha():
+    try:
+        return _run(["git", "rev-parse", "HEAD"]).stdout.strip()
+    except subprocess.CalledProcessError:
+        sys.exit("Not inside a git repo. Pass --sha explicitly.")
+
+
+def _git_repo():
+    try:
+        url = _run(["git", "remote", "get-url", "origin"]).stdout.strip()
+    except subprocess.CalledProcessError:
+        sys.exit("No git remote 'origin'. Pass --repo explicitly.")
+    if "github.com/" in url:
+        repo = url.split("github.com/")[-1].removesuffix(".git").removesuffix("/")
+        return repo
+    if "github.com:" in url:
+        repo = url.split("github.com:")[-1].removesuffix(".git")
+        return repo
+    sys.exit(f"Cannot parse GitHub owner/repo from remote URL: {url}\nPass --repo explicitly.")
+
+
+def _dispatch(token, head_repo, head_sha):
+    result = _gh(
+        [
+            "api",
+            f"repos/{VAULT_REPO}/actions/workflows/{WORKFLOW}/dispatches",
+            "-X", "POST",
+            "-F", "ref=main",
+            "-F", "inputs[pr_number]=0",
+            "-F", f"inputs[head_sha]={head_sha}",
+            "-F", f"inputs[head_repo]={head_repo}",
+        ],
+        token,
+        check=False,
+    )
+    if result.returncode != 0:
+        sys.exit(
+            f"Dispatch failed (HTTP {result.returncode}):\n{result.stderr}\n"
+            f"Check that JASECIBENCH_EVAL_TOKEN has Actions:write on {VAULT_REPO}."
+        )
+
+
+def _find_run(token, after_ts):
+    for attempt in range(FIND_RETRIES):
+        time.sleep(5)
+        result = _gh(
+            [
+                "run", "list",
+                "--repo", VAULT_REPO,
+                "--workflow", WORKFLOW,
+                "--limit", "5",
+                "--json", "databaseId,createdAt,status",
+            ],
+            token,
+            check=False,
+        )
+        if result.returncode != 0:
+            continue
+        runs = json.loads(result.stdout)
+        for r in runs:
+            # createdAt is like "2026-04-30T10:05:00Z"
+            if r["createdAt"] >= after_ts:
+                return r["databaseId"]
+        if attempt < FIND_RETRIES - 1:
+            print("  Waiting for workflow to appear in the queue...", flush=True)
+    sys.exit(
+        "Could not find the dispatched run. "
+        f"Check https://github.com/{VAULT_REPO}/actions manually."
+    )
+
+
+def _poll(token, run_id):
+    print(f"  Polling run {run_id} ...", flush=True)
+    for _ in range(MAX_POLLS):
+        time.sleep(POLL_SECS)
+        result = _gh(
+            [
+                "run", "view", str(run_id),
+                "--repo", VAULT_REPO,
+                "--json", "status,conclusion",
+            ],
+            token,
+            check=False,
+        )
+        if result.returncode != 0:
+            continue
+        data = json.loads(result.stdout)
+        if data["status"] == "completed":
+            return data["conclusion"]
+        print("  ...", flush=True)
+    sys.exit("Timed out after 10 minutes. Check the vault Actions tab.")
+
+
+def _fetch_results(token, run_id):
+    result = _gh(
+        ["run", "view", str(run_id), "--repo", VAULT_REPO, "--log"],
+        token,
+        check=False,
+    )
+    return result.stdout
+
+
+def _print_results(raw_log):
+    inside = False
+    found  = False
+    for line in raw_log.splitlines():
+        # Log lines are "JOB\tSTEP\t TIMESTAMP CONTENT" — take everything
+        # after the second tab (or the whole line if no tabs).
+        parts   = line.split("\t", 2)
+        content = parts[-1].strip() if len(parts) >= 2 else line.strip()
+
+        if content == "---JASECIBENCH-RESULTS-START---":
+            inside = True
+            found  = True
+            continue
+        if content == "---JASECIBENCH-RESULTS-END---":
+            inside = False
+            continue
+        if inside:
+            print(content)
+
+    if not found:
+        print(
+            "\n(Could not find result markers in the log. "
+            f"View full run at https://github.com/{VAULT_REPO}/actions/runs/{run_id[0] if isinstance(run_id, tuple) else ''})"
+        )
+
+
+def main():
+    parser = argparse.ArgumentParser(
+        description="Grade candidate code via vault CI without a PR.",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("--repo", help="GitHub owner/repo of candidate code (default: git remote origin).")
+    parser.add_argument("--sha",  help="Commit SHA to grade (default: current HEAD).")
+    args = parser.parse_args()
+
+    token = os.environ.get("JASECIBENCH_EVAL_TOKEN")
+    if not token:
+        sys.exit(
+            "JASECIBENCH_EVAL_TOKEN is not set.\n"
+            "Ask a maintainer for a fine-grained PAT with Actions:write on JaseciBench-vault."
+        )
+
+    head_repo = args.repo or _git_repo()
+    head_sha  = args.sha  or _git_sha()
+
+    print(f"\nJaseciBench local grade")
+    print(f"  candidate : {head_repo} @ {head_sha[:12]}")
+    print(f"  vault     : {VAULT_REPO}")
+    print()
+
+    # Timestamp used to identify the newly dispatched run.
+    after_ts = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+
+    print("Dispatching grading workflow ...", flush=True)
+    _dispatch(token, head_repo, head_sha)
+
+    run_id = _find_run(token, after_ts)
+    print(f"Run found: https://github.com/{VAULT_REPO}/actions/runs/{run_id}", flush=True)
+
+    conclusion = _poll(token, run_id)
+
+    print("\n--- Results ---")
+    raw_log = _fetch_results(token, run_id)
+    _print_results(raw_log)
+
+    print(f"\nConclusion: {conclusion}")
+    sys.exit(0 if conclusion == "success" else 1)
+
+
+if __name__ == "__main__":
+    main()
