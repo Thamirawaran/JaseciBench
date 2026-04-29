@@ -87,22 +87,32 @@ def _git_repo():
 
 
 def _dispatch(token, head_repo, head_sha):
-    result = _gh(
+    # workflow_dispatch requires a JSON body (not -F form fields) so that
+    # the nested "inputs" object is serialised correctly.
+    payload = json.dumps({
+        "ref": "main",
+        "inputs": {
+            "pr_number": "0",
+            "head_sha": head_sha,
+            "head_repo": head_repo,
+        }
+    })
+    env = {**os.environ, "GH_TOKEN": token}
+    result = subprocess.run(
         [
-            "api",
+            "gh", "api",
             f"repos/{VAULT_REPO}/actions/workflows/{WORKFLOW}/dispatches",
             "-X", "POST",
-            "-F", "ref=main",
-            "-F", "inputs[pr_number]=0",
-            "-F", f"inputs[head_sha]={head_sha}",
-            "-F", f"inputs[head_repo]={head_repo}",
+            "--input", "-",
         ],
-        token,
-        check=False,
+        input=payload,
+        capture_output=True,
+        text=True,
+        env=env,
     )
     if result.returncode != 0:
         sys.exit(
-            f"Dispatch failed (HTTP {result.returncode}):\n{result.stderr}\n"
+            f"Dispatch failed:\n{result.stderr}\n"
             f"Check that JASECIBENCH_EVAL_TOKEN has Actions:write on {VAULT_REPO}."
         )
 
@@ -167,29 +177,31 @@ def _fetch_results(token, run_id):
     return result.stdout
 
 
-def _print_results(raw_log):
+def _print_results(raw_log, run_id):
     inside = False
     found  = False
     for line in raw_log.splitlines():
-        # Log lines are "JOB\tSTEP\t TIMESTAMP CONTENT" — take everything
-        # after the second tab (or the whole line if no tabs).
+        # Log lines are "JOB\tSTEP\tTIMESTAMP CONTENT" — take the last segment.
         parts   = line.split("\t", 2)
         content = parts[-1].strip() if len(parts) >= 2 else line.strip()
 
-        if content == "---JASECIBENCH-RESULTS-START---":
+        if "---JASECIBENCH-RESULTS-START---" in content:
             inside = True
             found  = True
             continue
-        if content == "---JASECIBENCH-RESULTS-END---":
+        if "---JASECIBENCH-RESULTS-END---" in content:
             inside = False
             continue
         if inside:
+            # Strip the leading timestamp (e.g. "2026-04-30T10:05:01.123Z ").
+            if "Z " in content:
+                content = content[content.index("Z ") + 2:]
             print(content)
 
     if not found:
         print(
-            "\n(Could not find result markers in the log. "
-            f"View full run at https://github.com/{VAULT_REPO}/actions/runs/{run_id[0] if isinstance(run_id, tuple) else ''})"
+            f"\n(Result markers not found in log. "
+            f"View full run: https://github.com/{VAULT_REPO}/actions/runs/{run_id})"
         )
 
 
@@ -218,7 +230,7 @@ def main():
     print()
 
     # Timestamp used to identify the newly dispatched run.
-    after_ts = datetime.datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%S")
+    after_ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
 
     print("Dispatching grading workflow ...", flush=True)
     _dispatch(token, head_repo, head_sha)
@@ -230,7 +242,7 @@ def main():
 
     print("\n--- Results ---")
     raw_log = _fetch_results(token, run_id)
-    _print_results(raw_log)
+    _print_results(raw_log, run_id)
 
     print(f"\nConclusion: {conclusion}")
     sys.exit(0 if conclusion == "success" else 1)
