@@ -42,6 +42,13 @@ walker:priv Compute {
                 return;
             }
             value = self.a / self.b;
+        } elif self.op == "%" {
+            if self.b == 0.0 {
+                self.error = "modulo by zero";
+                report {"error": self.error};
+                return;
+            }
+            value = self.a % self.b;
         } else {
             self.error = "unknown operator: " + self.op;
             report {"error": self.error};
