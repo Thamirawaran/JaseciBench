@@ -1,0 +1,59 @@
+name: ci
+
+# Public-side CI: type-check the calculator app, run its baseline test
+# suite, and validate that every task directory has the public files
+# the agent is expected to read. The hidden grading lives in the vault
+# and runs via grade-pr / grade-submission.
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  calculator-baseline:
+    name: calculator app — type check + baseline tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install jaclang
+        run: |
+          python -m pip install --upgrade pip
+          pip install "jaclang>=0.14"
+
+      - name: jac check main.jac
+        working-directory: suite/agent/basic/calculator/jaclang/app
+        run: jac check main.jac
+
+      - name: jac test tests/baseline.jac
+        working-directory: suite/agent/basic/calculator/jaclang/app
+        run: jac test tests/baseline.jac
+
+  validate-task-structure:
+    name: tasks — every task has issue.md + tests.jac
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify task directory shape
+        shell: bash
+        run: |
+          set -euo pipefail
+          missing=0
+          for d in suite/agent/basic/calculator/jaclang/tasks/*/; do
+            for f in issue.md tests.jac; do
+              if [ ! -f "$d/$f" ]; then
+                echo "::error file=$d::missing $f"
+                missing=$((missing + 1))
+              fi
+            done
+          done
+          if [ "$missing" -gt 0 ]; then
+            echo "task structure invalid ($missing missing files)"
+            exit 1
+          fi
+          echo "all tasks have issue.md + tests.jac"
