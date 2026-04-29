@@ -1,0 +1,66 @@
+name: grade-pr
+
+# Maintainer-triggered hidden evaluation of a pull request.
+#
+# Run from the Actions tab: pick "grade-pr" → "Run workflow" → enter
+# the PR number. This workflow resolves the PR's head ref, fires a
+# repository_dispatch into the private vault, and posts a "queued"
+# comment on the PR. Final scores are posted by the vault's
+# grade-submission workflow when grading completes.
+#
+# Why workflow_dispatch and not auto-on-PR: only users with write
+# access to this repo can trigger workflow_dispatch, which keeps
+# unsolicited external PRs out of the grading queue.
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to grade"
+        required: true
+        type: string
+
+permissions:
+  pull-requests: write
+  contents: read
+
+jobs:
+  dispatch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Resolve PR head ref
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          info=$(gh api repos/${{ github.repository }}/pulls/${{ inputs.pr_number }})
+          head_sha=$(echo "$info" | jq -r .head.sha)
+          head_repo=$(echo "$info" | jq -r .head.repo.full_name)
+          if [ -z "$head_sha" ] || [ "$head_sha" = "null" ]; then
+            echo "::error::Could not resolve PR #${{ inputs.pr_number }}"
+            exit 1
+          fi
+          echo "sha=$head_sha"   >> "$GITHUB_OUTPUT"
+          echo "repo=$head_repo" >> "$GITHUB_OUTPUT"
+          echo "Resolved PR #${{ inputs.pr_number }} -> $head_repo @ $head_sha"
+
+      - name: Dispatch grading job to vault
+        env:
+          GH_TOKEN: ${{ secrets.JASECIBENCH_VAULT_DISPATCH_TOKEN }}
+        run: |
+          set -euo pipefail
+          gh api repos/Thamirawaran/JaseciBench-vault/dispatches \
+            -X POST \
+            -F event_type=grade-pr \
+            -F "client_payload[pr_number]=${{ inputs.pr_number }}" \
+            -F "client_payload[head_sha]=${{ steps.pr.outputs.sha }}" \
+            -F "client_payload[head_repo]=${{ steps.pr.outputs.repo }}"
+
+      - name: Acknowledge on PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr comment ${{ inputs.pr_number }} \
+            --repo ${{ github.repository }} \
+            --body "Hidden evaluation queued for \`${{ steps.pr.outputs.sha }}\`. Results will appear here when grading completes (~2 min)."
