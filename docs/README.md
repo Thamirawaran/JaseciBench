@@ -21,4 +21,6 @@ in the companion private repo **JaseciBench-vault**.
 - [Submit a run](../website/components/pages/SubmitPage.cl.jac) — open a PR adding a JSON file under `leaderboard-data/<layer>/`
 - [Benchmark tasks](../suite/agent/basic/calculator/jaclang/tasks/) — each task has an `issue.md` with the agent's prompt
 
-Full docs — architecture, submission guide, contributing — coming soon.
+See [`submission-guide.md`](submission-guide.md) for how to evaluate your agent locally and how to submit to the leaderboard.
+
+More docs — architecture, contributing — coming soon.
