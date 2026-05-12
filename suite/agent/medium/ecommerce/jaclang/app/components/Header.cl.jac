@@ -2,9 +2,19 @@
 
 import from "@jac/runtime" { Link }
 import from "lucide-react" { ShoppingCart, Package, Search, Home }
+sv import from ..services.cart { get_cart }
 
 
 def:pub Header() -> JsxElement {
+    has cart_count: int = 0;
+
+    async can with entry {
+        res = await get_cart("user_001");
+        if res {
+            cart_count = res["count"];
+        }
+    }
+
     return <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/90 backdrop-blur">
         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center justify-between">
             <Link to="/" className="flex items-center gap-2 text-gray-900 font-bold tracking-tight">
@@ -22,7 +32,12 @@ def:pub Header() -> JsxElement {
                 </Link>
                 <Link to="/cart" className="px-3 py-1.5 rounded-md text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-1.5">
                     <ShoppingCart size={14} />
-                    Cart
+                    <span className="inline-flex items-center gap-2">
+                        Cart
+                        {<span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 rounded-full bg-indigo-600 text-white text-xs font-semibold leading-none">
+                            {str(cart_count)}
+                        </span> if cart_count > 0 else <></>}
+                    </span>
                 </Link>
                 <Link to="/orders" className="px-3 py-1.5 rounded-md text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100">
                     Orders

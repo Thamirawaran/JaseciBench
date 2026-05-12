@@ -43,9 +43,18 @@ def:pub get_cart(user_id: str) -> dict {
             continue;
         }
         items.append(cart_item_dict(ci, v));
-        total = total + v.price;
+        total = total + (v.price * ci.quantity);
     }
-    return {"items": items, "total": total};
+    shipping = (5.99 if total > 0.0 else 0.0);
+    grand_total = total + shipping;
+    grand_total_rounded = int(grand_total * 100) / 100.0;
+    return {
+        "items": items,
+        "total": total,
+        "shipping": shipping,
+        "grand_total": grand_total_rounded,
+        "count": len(items),
+    };
 }
 
 
@@ -58,15 +67,27 @@ def:pub add_to_cart(user_id: str, variant_id: str, quantity: int = 1) -> dict {
     if v is None {
         return {"error": "Variant not found", "status": 404};
     }
-    if v.stock_qty < quantity {
+    existing_qty = 0;
+    existing_ci: CartItem | None = None;
+    for ci in [root() -->][?:CartItem] {
+        if ci.user_id == user_id and ci.variant_id == variant_id {
+            existing_ci = ci;
+            existing_qty = ci.quantity;
+            break;
+        }
+    }
+
+    if existing_qty + quantity > v.stock_qty {
         return {"error": "Insufficient stock", "status": 400};
     }
 
-    for ci in [root() -->][?:CartItem] {
-        if ci.user_id == user_id and ci.variant_id == variant_id {
-            ci.quantity = ci.quantity + quantity;
-            return {"id": ci.id, "variant_id": ci.variant_id, "quantity": ci.quantity};
-        }
+    if existing_ci is not None {
+        existing_ci.quantity = existing_ci.quantity + quantity;
+        return {
+            "id": existing_ci.id,
+            "variant_id": existing_ci.variant_id,
+            "quantity": existing_ci.quantity,
+        };
     }
 
     next_id = "ci_" + str(len([root() -->][?:CartItem]) + 1).zfill(3);
@@ -186,6 +207,9 @@ def:pub checkout(
             price_snapshot=v.price,
             variant_id=v.id,
         );
+
+        # Decrement stock for each checked-out line item.
+        v.stock_qty = v.stock_qty - qty;
     }
 
     total_rounded = int(total * 100) / 100.0;

@@ -18,6 +18,15 @@ def find_order(order_id: str) -> Order | None {
 
 def order_dict(o: Order, include_items: bool = True) -> dict {
     if not include_items {
+        total_paid = 0.0;
+        for p in [o -->][?:Payment] {
+            if p.transaction_type == "payment" {
+                total_paid = total_paid + p.amount;
+            } elif p.transaction_type == "refund" {
+                total_paid = total_paid - p.amount;
+            }
+        }
+        total_paid = int(total_paid * 100) / 100.0;
         return {
             "id": o.id,
             "user_id": o.user_id,
@@ -30,6 +39,7 @@ def order_dict(o: Order, include_items: bool = True) -> dict {
             "shipping_country": o.shipping_country,
             "created_at": o.created_at,
             "item_count": len([o -->][?:OrderItem]),
+            "total_paid": total_paid,
         };
     }
     items = [
@@ -158,6 +168,9 @@ def:pub return_items(order_id: str, item_ids: list[str], payment_method_id: str)
         oi = find_order_item(o, oi_id);
         if oi is None {
             return {"error": "Order item " + oi_id + " not found in order", "status": 404};
+        }
+        if oi.returned {
+            return {"error": "Order item " + oi_id + " is already returned", "status": 400};
         }
         items_to_return.append(oi);
     }

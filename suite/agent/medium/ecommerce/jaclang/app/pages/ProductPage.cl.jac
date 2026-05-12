@@ -56,6 +56,13 @@ def:pub ProductPage() -> JsxElement {
                 <h1 className="text-3xl font-bold text-gray-900">{product["name"]}</h1>
                 <p className="text-gray-600 mt-2 leading-relaxed">{product["description"]}</p>
 
+                {(
+                    <div className="mt-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-red-800">
+                        <p className="text-sm font-semibold">Currently unavailable</p>
+                        <p className="text-xs mt-1 text-red-700">All variants are out of stock.</p>
+                    </div>
+                ) if (sum([v["stock_qty"] for v in product["variants"]]) == 0) else None}
+
                 <div className="mt-6">
                     <h3 className="text-sm font-semibold text-gray-900 mb-2">Variants</h3>
                     <div className="space-y-2">

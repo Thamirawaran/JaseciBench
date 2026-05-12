@@ -50,7 +50,9 @@ def:pub CartPage() -> JsxElement {
     items = cart["items"] if cart else [];
 
     return <div className="max-w-4xl mx-auto px-6 py-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-6">Shopping Cart</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-6">
+            {"Shopping Cart (" + str(cart["count"] if cart and "count" in cart else 0) + " items)"}
+        </h1>
 
         {(<div>
             <div className="space-y-3">
@@ -77,6 +79,9 @@ def:pub CartPage() -> JsxElement {
                             className="w-8 h-8 rounded border border-gray-300 hover:bg-gray-50 text-gray-600"
                         >+</button>
                     </div>
+                    <div className="w-20 text-right text-sm font-semibold text-gray-900">
+                        {"$" + str(item["subtotal"])}
+                    </div>
                     <button
                         onClick={lambda _e: MouseEvent { remove_item(item["id"]); }}
                         className="text-gray-400 hover:text-red-600 text-sm"
@@ -85,19 +90,39 @@ def:pub CartPage() -> JsxElement {
             </div>
 
             <div className="mt-6 p-5 bg-gray-50 rounded-xl flex items-center justify-between">
-                <div>
-                    <div className="text-sm text-gray-600">Total</div>
-                    <div className="text-2xl font-bold text-gray-900">{"$" + str(cart["total"])}</div>
+                <div className="w-full">
+                    <div className="flex items-center justify-between text-sm text-gray-600">
+                        <span>Subtotal</span>
+                        <span>{"$" + str(cart["total"])}</span>
+                    </div>
+                    <div className="mt-1 flex items-center justify-between text-sm text-gray-600">
+                        <span>Shipping</span>
+                        <span>{"$" + str(cart["shipping"])}</span>
+                    </div>
+                    <div className="mt-2 flex items-center justify-between">
+                        <span className="text-sm text-gray-700">Grand total</span>
+                        <span className="text-2xl font-bold text-gray-900">{"$" + str(cart["grand_total"])}</span>
+                    </div>
                 </div>
                 <button
                     onClick={do_checkout}
                     disabled={checking_out}
-                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+                    className="ml-6 px-6 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
                 >
                     {("Processing..." if checking_out else "Checkout")}
                 </button>
             </div>
             {(<p className="mt-3 text-sm text-center text-red-600">{feedback}</p>) if feedback else None}
         </div>) if len(items) > 0 else None}
+
+        {(<div className="mt-10 p-10 bg-white border border-gray-200 rounded-2xl text-center">
+            <p className="text-gray-700">Your cart is empty.</p>
+            <div className="mt-5">
+                <Link
+                    to="/"
+                    className="inline-flex items-center justify-center px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold rounded-lg transition-colors"
+                >Browse products</Link>
+            </div>
+        </div>) if len(items) == 0 else None}
     </div>;
 }
