@@ -1,0 +1,1197 @@
+  Checking frontend.cl.jac...
+frontend.cl.jac FAILED [5%]
+  Checking seed.jac...
+seed.jac PASSED [11%]
+  Checking main.jac...
+main.jac PASSED [16%]
+  Checking models.jac...
+models.jac PASSED [22%]
+  Checking tests/baseline.jac...
+tests/baseline.jac PASSED [27%]
+  Checking components/Header.cl.jac...
+components/Header.cl.jac FAILED [33%]
+  Checking components/ProductCard.cl.jac...
+components/ProductCard.cl.jac FAILED [38%]
+  Checking lib/utils.cl.jac...
+lib/utils.cl.jac PASSED [44%]
+  Checking pages/SearchPage.cl.jac...
+pages/SearchPage.cl.jac PASSED [50%]
+  Checking pages/CartPage.cl.jac...
+pages/CartPage.cl.jac FAILED [55%]
+  Checking pages/OrdersPage.cl.jac...
+pages/OrdersPage.cl.jac FAILED [61%]
+  Checking pages/ProductPage.cl.jac...
+pages/ProductPage.cl.jac FAILED [66%]
+  Checking pages/CatalogPage.cl.jac...
+pages/CatalogPage.cl.jac PASSED [72%]
+  Checking services/cart.sv.jac...
+services/cart.sv.jac PASSED [77%]
+  Checking services/reviews.sv.jac...
+services/reviews.sv.jac FAILED [83%]
+  Checking services/orders.sv.jac...
+services/orders.sv.jac FAILED [88%]
+  Checking services/users.sv.jac...
+services/users.sv.jac PASSED [94%]
+  Checking services/catalog.sv.jac...
+services/catalog.sv.jac PASSED [100%]
+
+=================================== FAILURES ===================================
+_______________________________ frontend.cl.jac ________________________________
+
+___________________________ components/Header.cl.jac ___________________________
+
+________________________ components/ProductCard.cl.jac _________________________
+
+_______________________________ lib/utils.cl.jac _______________________________
+
+___________________________ pages/SearchPage.cl.jac ____________________________
+
+____________________________ pages/CartPage.cl.jac _____________________________
+
+___________________________ pages/OrdersPage.cl.jac ____________________________
+
+___________________________ pages/ProductPage.cl.jac ___________________________
+
+___________________________ pages/CatalogPage.cl.jac ___________________________
+
+_____________________________ services/cart.sv.jac _____________________________
+
+___________________________ services/reviews.sv.jac ____________________________
+
+____________________________ services/orders.sv.jac ____________________________
+
+____________________________ services/users.sv.jac _____________________________
+
+___________________________ services/catalog.sv.jac ____________________________
+
+================================= failed files =================================
+frontend.cl.jac - 12 errors, 3 warnings
+components/Header.cl.jac - 30 errors, 1 warning
+components/ProductCard.cl.jac - 6 errors, 0 warnings
+lib/utils.cl.jac - 0 errors, 2 warnings
+pages/SearchPage.cl.jac - 0 errors, 1 warning
+pages/CartPage.cl.jac - 9 errors, 5 warnings
+pages/OrdersPage.cl.jac - 7 errors, 3 warnings
+pages/ProductPage.cl.jac - 18 errors, 3 warnings
+pages/CatalogPage.cl.jac - 0 errors, 2 warnings
+services/cart.sv.jac - 0 errors, 1 warning
+services/reviews.sv.jac - 2 errors, 0 warnings
+services/orders.sv.jac - 1 error, 0 warnings
+services/users.sv.jac - 0 errors, 1 warning
+services/catalog.sv.jac - 0 errors, 2 warnings
+========================= 10 passed, 8 failed in 1.10s =========================
+STDERR:
+✖ Error: error[E1101]: Component 'Route' has no prop 'element'
+  --> frontend.cl.jac:17:33
+   15 |             <Header />
+   16 |             <Routes>
+   17 |                 <Route path="/" element={<CatalogPage />} />
+      |                                 ^^^^^^^^^^^^^^^^^^^^^^^^^
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+   19 |                 <Route path="/cart" element={<CartPage />} />
+✖ Error: error[E1102]: Component 'Route' requires prop 'component'
+  --> frontend.cl.jac:17:17
+   15 |             <Header />
+   16 |             <Routes>
+   17 |                 <Route path="/" element={<CatalogPage />} />
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+   19 |                 <Route path="/cart" element={<CartPage />} />
+✖ Error: error[E1101]: Component 'Route' has no prop 'element'
+  --> frontend.cl.jac:18:45
+   16 |             <Routes>
+   17 |                 <Route path="/" element={<CatalogPage />} />
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+      |                                             ^^^^^^^^^^^^^^^^^^^^^^^^^
+   19 |                 <Route path="/cart" element={<CartPage />} />
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+✖ Error: error[E1102]: Component 'Route' requires prop 'component'
+  --> frontend.cl.jac:18:17
+   16 |             <Routes>
+   17 |                 <Route path="/" element={<CatalogPage />} />
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   19 |                 <Route path="/cart" element={<CartPage />} />
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+✖ Error: error[E1101]: Component 'Route' has no prop 'element'
+  --> frontend.cl.jac:19:37
+   17 |                 <Route path="/" element={<CatalogPage />} />
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+   19 |                 <Route path="/cart" element={<CartPage />} />
+      |                                     ^^^^^^^^^^^^^^^^^^^^^^
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+   21 |                 <Route path="/search" element={<SearchPage />} />
+✖ Error: error[E1102]: Component 'Route' requires prop 'component'
+  --> frontend.cl.jac:19:17
+   17 |                 <Route path="/" element={<CatalogPage />} />
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+   19 |                 <Route path="/cart" element={<CartPage />} />
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+   21 |                 <Route path="/search" element={<SearchPage />} />
+✖ Error: error[E1101]: Component 'Route' has no prop 'element'
+  --> frontend.cl.jac:20:39
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+   19 |                 <Route path="/cart" element={<CartPage />} />
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+      |                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+   21 |                 <Route path="/search" element={<SearchPage />} />
+   22 |                 <Route path="*" element={<Navigate to="/" replace={True}
+/>} />
+✖ Error: error[E1102]: Component 'Route' requires prop 'component'
+  --> frontend.cl.jac:20:17
+   18 |                 <Route path="/products/:id" element={<ProductPage />} />
+   19 |                 <Route path="/cart" element={<CartPage />} />
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   21 |                 <Route path="/search" element={<SearchPage />} />
+   22 |                 <Route path="*" element={<Navigate to="/" replace={True}
+/>} />
+✖ Error: error[E1101]: Component 'Route' has no prop 'element'
+  --> frontend.cl.jac:21:39
+   19 |                 <Route path="/cart" element={<CartPage />} />
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+   21 |                 <Route path="/search" element={<SearchPage />} />
+      |                                       ^^^^^^^^^^^^^^^^^^^^^^^^
+   22 |                 <Route path="*" element={<Navigate to="/" replace={True}
+/>} />
+   23 |             </Routes>
+✖ Error: error[E1102]: Component 'Route' requires prop 'component'
+  --> frontend.cl.jac:21:17
+   19 |                 <Route path="/cart" element={<CartPage />} />
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+   21 |                 <Route path="/search" element={<SearchPage />} />
+      |                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   22 |                 <Route path="*" element={<Navigate to="/" replace={True}
+/>} />
+   23 |             </Routes>
+✖ Error: error[E1101]: Component 'Route' has no prop 'element'
+  --> frontend.cl.jac:22:33
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+   21 |                 <Route path="/search" element={<SearchPage />} />
+   22 |                 <Route path="*" element={<Navigate to="/" replace={True}
+/>} />
+      |                                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   23 |             </Routes>
+   24 |         </div>
+✖ Error: error[E1102]: Component 'Route' requires prop 'component'
+  --> frontend.cl.jac:22:17
+   20 |                 <Route path="/orders" element={<OrdersPage />} />
+   21 |                 <Route path="/search" element={<SearchPage />} />
+   22 |                 <Route path="*" element={<Navigate to="/" replace={True}
+/>} />
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   23 |             </Routes>
+   24 |         </div>
+⚠ warning[W1101]: Cannot import name 'Router' from module '@jac/runtime'
+  --> frontend.cl.jac:3:30
+    1 | """Top-level client shell: Router + Routes."""
+    2 | 
+    3 | import from "@jac/runtime" { Router, Routes, Route, Navigate }
+      |                              ^^^^^^
+    4 | import from .components.Header { Header }
+    5 | import from .pages.CatalogPage { CatalogPage }
+⚠ warning[W1101]: Cannot import name 'Routes' from module '@jac/runtime'
+  --> frontend.cl.jac:3:38
+    1 | """Top-level client shell: Router + Routes."""
+    2 | 
+    3 | import from "@jac/runtime" { Router, Routes, Route, Navigate }
+      |                                      ^^^^^^
+    4 | import from .components.Header { Header }
+    5 | import from .pages.CatalogPage { CatalogPage }
+⚠ warning[W1101]: Cannot import name 'Navigate' from module '@jac/runtime'
+  --> frontend.cl.jac:3:53
+    1 | """Top-level client shell: Router + Routes."""
+    2 | 
+    3 | import from "@jac/runtime" { Router, Routes, Route, Navigate }
+      |                                                     ^^^^^^^^
+    4 | import from .components.Header { Header }
+    5 | import from .pages.CatalogPage { CatalogPage }
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:10:19
+    8 |     return <header className="sticky top-0 z-50 border-b border-gray-200
+bg-white/90 backdrop-blur">
+    9 |         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center 
+justify-between">
+   10 |             <Link to="/" className="flex items-center gap-2 
+text-gray-900 font-bold tracking-tight">
+      |                   ^^^^^^
+   11 |                 <Package size={18} className="text-indigo-600" />
+   12 |                 <span>Jac Mart</span>
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:10:26
+    8 |     return <header className="sticky top-0 z-50 border-b border-gray-200
+bg-white/90 backdrop-blur">
+    9 |         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center 
+justify-between">
+   10 |             <Link to="/" className="flex items-center gap-2 
+text-gray-900 font-bold tracking-tight">
+      |                          
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   11 |                 <Package size={18} className="text-indigo-600" />
+   12 |                 <span>Jac Mart</span>
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:10:13
+    8 |     return <header className="sticky top-0 z-50 border-b border-gray-200
+bg-white/90 backdrop-blur">
+    9 |         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center 
+justify-between">
+   10 |             <Link to="/" className="flex items-center gap-2 
+text-gray-900 font-bold tracking-tight">
+      |             
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
+   11 |                 <Package size={18} className="text-indigo-600" />
+   12 |                 <span>Jac Mart</span>
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:10:19
+    8 |     return <header className="sticky top-0 z-50 border-b border-gray-200
+bg-white/90 backdrop-blur">
+    9 |         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center 
+justify-between">
+   10 |             <Link to="/" className="flex items-center gap-2 
+text-gray-900 font-bold tracking-tight">
+      |                   ^^^^^^
+   11 |                 <Package size={18} className="text-indigo-600" />
+   12 |                 <span>Jac Mart</span>
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:10:26
+    8 |     return <header className="sticky top-0 z-50 border-b border-gray-200
+bg-white/90 backdrop-blur">
+    9 |         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center 
+justify-between">
+   10 |             <Link to="/" className="flex items-center gap-2 
+text-gray-900 font-bold tracking-tight">
+      |                          
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   11 |                 <Package size={18} className="text-indigo-600" />
+   12 |                 <span>Jac Mart</span>
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:10:13
+    8 |     return <header className="sticky top-0 z-50 border-b border-gray-200
+bg-white/90 backdrop-blur">
+    9 |         <div className="max-w-6xl mx-auto px-6 h-14 flex items-center 
+justify-between">
+   10 |             <Link to="/" className="flex items-center gap-2 
+text-gray-900 font-bold tracking-tight">
+      |             
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^
+   11 |                 <Package size={18} className="text-indigo-600" />
+   12 |                 <span>Jac Mart</span>
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:15:23
+   13 |             </Link>
+   14 |             <nav className="flex items-center gap-1">
+   15 |                 <Link to="/" className="px-3 py-1.5 rounded-md text-sm 
+text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-1.5">
+      |                       ^^^^^^
+   16 |                     <Home size={14} />
+   17 |                     Catalog
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:15:30
+   13 |             </Link>
+   14 |             <nav className="flex items-center gap-1">
+   15 |                 <Link to="/" className="px-3 py-1.5 rounded-md text-sm 
+text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-1.5">
+      |                              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   16 |                     <Home size={14} />
+   17 |                     Catalog
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:15:17
+   13 |             </Link>
+   14 |             <nav className="flex items-center gap-1">
+   15 |                 <Link to="/" className="px-3 py-1.5 rounded-md text-sm 
+text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-1.5">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   16 |                     <Home size={14} />
+   17 |                     Catalog
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:15:23
+   13 |             </Link>
+   14 |             <nav className="flex items-center gap-1">
+   15 |                 <Link to="/" className="px-3 py-1.5 rounded-md text-sm 
+text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-1.5">
+      |                       ^^^^^^
+   16 |                     <Home size={14} />
+   17 |                     Catalog
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:15:30
+   13 |             </Link>
+   14 |             <nav className="flex items-center gap-1">
+   15 |                 <Link to="/" className="px-3 py-1.5 rounded-md text-sm 
+text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-1.5">
+      |                              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   16 |                     <Home size={14} />
+   17 |                     Catalog
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:15:17
+   13 |             </Link>
+   14 |             <nav className="flex items-center gap-1">
+   15 |                 <Link to="/" className="px-3 py-1.5 rounded-md text-sm 
+text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center gap-1.5">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   16 |                     <Home size={14} />
+   17 |                     Catalog
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:19:23
+   17 |                     Catalog
+   18 |                 </Link>
+   19 |                 <Link to="/search" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                       ^^^^^^^^^^^^
+   20 |                     <Search size={14} />
+   21 |                     Search
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:19:36
+   17 |                     Catalog
+   18 |                 </Link>
+   19 |                 <Link to="/search" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                                    
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   20 |                     <Search size={14} />
+   21 |                     Search
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:19:17
+   17 |                     Catalog
+   18 |                 </Link>
+   19 |                 <Link to="/search" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   20 |                     <Search size={14} />
+   21 |                     Search
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:19:23
+   17 |                     Catalog
+   18 |                 </Link>
+   19 |                 <Link to="/search" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                       ^^^^^^^^^^^^
+   20 |                     <Search size={14} />
+   21 |                     Search
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:19:36
+   17 |                     Catalog
+   18 |                 </Link>
+   19 |                 <Link to="/search" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                                    
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   20 |                     <Search size={14} />
+   21 |                     Search
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:19:17
+   17 |                     Catalog
+   18 |                 </Link>
+   19 |                 <Link to="/search" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   20 |                     <Search size={14} />
+   21 |                     Search
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:23:23
+   21 |                     Search
+   22 |                 </Link>
+   23 |                 <Link to="/cart" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                       ^^^^^^^^^^
+   24 |                     <ShoppingCart size={14} />
+   25 |                     Cart
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:23:34
+   21 |                     Search
+   22 |                 </Link>
+   23 |                 <Link to="/cart" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                                  
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   24 |                     <ShoppingCart size={14} />
+   25 |                     Cart
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:23:17
+   21 |                     Search
+   22 |                 </Link>
+   23 |                 <Link to="/cart" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   24 |                     <ShoppingCart size={14} />
+   25 |                     Cart
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:23:23
+   21 |                     Search
+   22 |                 </Link>
+   23 |                 <Link to="/cart" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                       ^^^^^^^^^^
+   24 |                     <ShoppingCart size={14} />
+   25 |                     Cart
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:23:34
+   21 |                     Search
+   22 |                 </Link>
+   23 |                 <Link to="/cart" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                                  
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   24 |                     <ShoppingCart size={14} />
+   25 |                     Cart
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:23:17
+   21 |                     Search
+   22 |                 </Link>
+   23 |                 <Link to="/cart" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100 flex items-center 
+gap-1.5">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   24 |                     <ShoppingCart size={14} />
+   25 |                     Cart
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:27:23
+   25 |                     Cart
+   26 |                 </Link>
+   27 |                 <Link to="/orders" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+      |                       ^^^^^^^^^^^^
+   28 |                     Orders
+   29 |                 </Link>
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:27:36
+   25 |                     Cart
+   26 |                 </Link>
+   27 |                 <Link to="/orders" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+      |                                    
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+   28 |                     Orders
+   29 |                 </Link>
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:27:17
+   25 |                     Cart
+   26 |                 </Link>
+   27 |                 <Link to="/orders" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   28 |                     Orders
+   29 |                 </Link>
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/Header.cl.jac:27:23
+   25 |                     Cart
+   26 |                 </Link>
+   27 |                 <Link to="/orders" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+      |                       ^^^^^^^^^^^^
+   28 |                     Orders
+   29 |                 </Link>
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/Header.cl.jac:27:36
+   25 |                     Cart
+   26 |                 </Link>
+   27 |                 <Link to="/orders" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+      |                                    
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
+   28 |                     Orders
+   29 |                 </Link>
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/Header.cl.jac:27:17
+   25 |                     Cart
+   26 |                 </Link>
+   27 |                 <Link to="/orders" className="px-3 py-1.5 rounded-md 
+text-sm text-gray-600 hover:text-gray-900 hover:bg-gray-100">
+      |                 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   28 |                     Orders
+   29 |                 </Link>
+⚠ warning[W1100]: Module not found
+  --> components/Header.cl.jac:4:13
+    2 | 
+    3 | import from "@jac/runtime" { Link }
+    4 | import from "lucide-react" { ShoppingCart, Package, Search, Home }
+      |             ^^^^^^^^^^^^^^
+    5 | 
+    6 | 
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/ProductCard.cl.jac:8:9
+    6 | def:pub ProductCard(product: Any) -> JsxElement {
+    7 |     return <Link
+    8 |         to={"/products/" + product["id"]}
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    9 |         className="group block bg-white border border-gray-200 
+rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all"
+   10 |     >
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/ProductCard.cl.jac:9:9
+    7 |     return <Link
+    8 |         to={"/products/" + product["id"]}
+    9 |         className="group block bg-white border border-gray-200 
+rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all"
+      |         
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   10 |     >
+   11 |         <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 
+to-gray-50 rounded-lg mb-3 flex items-center justify-center text-gray-300 
+text-2xl font-light">
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/ProductCard.cl.jac:7:12
+    5 | 
+    6 | def:pub ProductCard(product: Any) -> JsxElement {
+    7 |     return <Link
+      |            ^^^^^
+    8 |         to={"/products/" + product["id"]}
+    9 |         className="group block bg-white border border-gray-200 
+rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all"
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> components/ProductCard.cl.jac:8:9
+    6 | def:pub ProductCard(product: Any) -> JsxElement {
+    7 |     return <Link
+    8 |         to={"/products/" + product["id"]}
+      |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    9 |         className="group block bg-white border border-gray-200 
+rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all"
+   10 |     >
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> components/ProductCard.cl.jac:9:9
+    7 |     return <Link
+    8 |         to={"/products/" + product["id"]}
+    9 |         className="group block bg-white border border-gray-200 
+rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all"
+      |         
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   10 |     >
+   11 |         <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 
+to-gray-50 rounded-lg mb-3 flex items-center justify-center text-gray-300 
+text-2xl font-light">
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> components/ProductCard.cl.jac:7:12
+    5 | 
+    6 | def:pub ProductCard(product: Any) -> JsxElement {
+    7 |     return <Link
+      |            ^^^^^
+    8 |         to={"/products/" + product["id"]}
+    9 |         className="group block bg-white border border-gray-200 
+rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all"
+⚠ warning[W1100]: Module not found
+  --> lib/utils.cl.jac:3:13
+    1 | """Client-side utilities: cn() class merger and price formatter."""
+    2 | 
+    3 | import from "clsx" { clsx }
+      |             ^^^^^^
+    4 | import from "tailwind-merge" { twMerge }
+    5 | 
+⚠ warning[W1100]: Module not found
+  --> lib/utils.cl.jac:4:13
+    2 | 
+    3 | import from "clsx" { clsx }
+    4 | import from "tailwind-merge" { twMerge }
+      |             ^^^^^^^^^^^^^^^^
+    5 | 
+    6 | 
+⚠ warning[W1036]: Generic type "list" used without type arguments, defaulting to
+"list[Any]"; consider adding explicit type arguments
+  --> pages/SearchPage.cl.jac:9:18
+    7 | def:pub SearchPage() -> JsxElement {
+    8 |     has query: str = "";
+    9 |     has results: list = [];
+      |                  ^^^^
+   10 |     has searching: bool = False;
+   11 |     has searched: bool = False;
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/CartPage.cl.jac:63:30
+   61 |                     <div className="flex-1 min-w-0">
+   62 |                         <div className="text-sm font-semibold 
+text-gray-900">
+   63 |                             {item["color"] + " · " + item["size"]}
+      |                              ^^^^^^^^^^^^^^^^^^^^^
+   64 |                         </div>
+   65 |                         <div className="text-xs text-gray-500 mt-0.5">
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/CartPage.cl.jac:63:30
+   61 |                     <div className="flex-1 min-w-0">
+   62 |                         <div className="text-sm font-semibold 
+text-gray-900">
+   63 |                             {item["color"] + " · " + item["size"]}
+      |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   64 |                         </div>
+   65 |                         <div className="text-xs text-gray-500 mt-0.5">
+✖ Error: error[E1055]: No matching overload found for method "__sub__" with the 
+given arguments
+  --> pages/CartPage.cl.jac:71:85
+   69 |                     <div className="flex items-center gap-2">
+   70 |                         <button
+   71 |                             onClick={lambda _e: MouseEvent { 
+update_qty(item["id"], item["quantity"] - 1); }}
+      |                                                                         
+^^^^^^^^^^^^^^^^^^^^
+   72 |                             className="w-8 h-8 rounded border 
+border-gray-300 hover:bg-gray-50 text-gray-600"
+   73 |                         >−</button>
+✖ Error: error[E1053]: Cannot assign <Unknown> to parameter 'item_id' of type 
+str
+  --> pages/CartPage.cl.jac:71:73
+   69 |                     <div className="flex items-center gap-2">
+   70 |                         <button
+   71 |                             onClick={lambda _e: MouseEvent { 
+update_qty(item["id"], item["quantity"] - 1); }}
+      |                                                                         
+^^^^^^^^^^
+   72 |                             className="w-8 h-8 rounded border 
+border-gray-300 hover:bg-gray-50 text-gray-600"
+   73 |                         >−</button>
+✖ Error: error[E1053]: Cannot assign <Unknown> to parameter 'qty' of type int
+  --> pages/CartPage.cl.jac:71:85
+   69 |                     <div className="flex items-center gap-2">
+   70 |                         <button
+   71 |                             onClick={lambda _e: MouseEvent { 
+update_qty(item["id"], item["quantity"] - 1); }}
+      |                                                                         
+^^^^^^^^^^^^^^^^^^^^
+   72 |                             className="w-8 h-8 rounded border 
+border-gray-300 hover:bg-gray-50 text-gray-600"
+   73 |                         >−</button>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/CartPage.cl.jac:76:85
+   74 |                         <span className="w-8 text-center text-sm 
+font-medium">{item["quantity"]}</span>
+   75 |                         <button
+   76 |                             onClick={lambda _e: MouseEvent { 
+update_qty(item["id"], item["quantity"] + 1); }}
+      |                                                                         
+^^^^^^^^^^^^^^^^^^^^
+   77 |                             className="w-8 h-8 rounded border 
+border-gray-300 hover:bg-gray-50 text-gray-600"
+   78 |                         >+</button>
+✖ Error: error[E1053]: Cannot assign <Unknown> to parameter 'item_id' of type 
+str
+  --> pages/CartPage.cl.jac:76:73
+   74 |                         <span className="w-8 text-center text-sm 
+font-medium">{item["quantity"]}</span>
+   75 |                         <button
+   76 |                             onClick={lambda _e: MouseEvent { 
+update_qty(item["id"], item["quantity"] + 1); }}
+      |                                                                         
+^^^^^^^^^^
+   77 |                             className="w-8 h-8 rounded border 
+border-gray-300 hover:bg-gray-50 text-gray-600"
+   78 |                         >+</button>
+✖ Error: error[E1053]: Cannot assign <Unknown> to parameter 'qty' of type int
+  --> pages/CartPage.cl.jac:76:85
+   74 |                         <span className="w-8 text-center text-sm 
+font-medium">{item["quantity"]}</span>
+   75 |                         <button
+   76 |                             onClick={lambda _e: MouseEvent { 
+update_qty(item["id"], item["quantity"] + 1); }}
+      |                                                                         
+^^^^^^^^^^^^^^^^^^^^
+   77 |                             className="w-8 h-8 rounded border 
+border-gray-300 hover:bg-gray-50 text-gray-600"
+   78 |                         >+</button>
+✖ Error: error[E1053]: Cannot assign <Unknown> to parameter 'item_id' of type 
+str
+  --> pages/CartPage.cl.jac:81:70
+   79 |                     </div>
+   80 |                     <button
+   81 |                         onClick={lambda _e: MouseEvent { 
+remove_item(item["id"]); }}
+      |                                                                      
+^^^^^^^^^^
+   82 |                         className="text-gray-400 hover:text-red-600 
+text-sm"
+   83 |                     >Remove</button>
+⚠ warning[W1101]: Cannot import name 'useNavigate' from module '@jac/runtime'
+  --> pages/CartPage.cl.jac:3:36
+    1 | """Cart page: view + mutate cart, checkout."""
+    2 | 
+    3 | import from "@jac/runtime" { Link, useNavigate }
+      |                                    ^^^^^^^^^^^
+    4 | sv import from ..services.cart { get_cart, update_cart_item, 
+remove_from_cart, checkout }
+    5 | 
+⚠ warning[W3037]: Unnecessary '-> None' return type annotation on 'refresh'; 
+functions without a return statement implicitly return None 
+  --> pages/CartPage.cl.jac:15:28
+   13 |     nav = useNavigate();
+   14 | 
+   15 |     async def refresh() -> None {
+      |                            ^^^^
+   16 |         result = await get_cart("user_001");
+   17 |         cart = result if result else {"items": [], "total": 0.0, 
+"count": 0};
+⚠ warning[W3037]: Unnecessary '-> None' return type annotation on 'update_qty'; 
+functions without a return statement implicitly return None 
+  --> pages/CartPage.cl.jac:25:53
+   23 |     }
+   24 | 
+   25 |     async def update_qty(item_id: str, qty: int) -> None {
+      |                                                     ^^^^
+   26 |         await update_cart_item(item_id, qty);
+   27 |         await refresh();
+⚠ warning[W3037]: Unnecessary '-> None' return type annotation on 'remove_item';
+functions without a return statement implicitly return None 
+  --> pages/CartPage.cl.jac:30:44
+   28 |     }
+   29 | 
+   30 |     async def remove_item(item_id: str) -> None {
+      |                                            ^^^^
+   31 |         await remove_from_cart(item_id);
+   32 |         await refresh();
+⚠ warning[W3037]: Unnecessary '-> None' return type annotation on 'do_checkout';
+functions without a return statement implicitly return None 
+  --> pages/CartPage.cl.jac:35:46
+   33 |     }
+   34 | 
+   35 |     async def do_checkout(_e: MouseEvent) -> None {
+      |                                              ^^^^
+   36 |         checking_out = True;
+   37 |         result = await checkout("user_001", "pm_001", "123 Main St", 
+"New York", "NY", "10001");
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/OrdersPage.cl.jac:41:30
+   39 |                         <div className="text-xs text-gray-500 
+mt-0.5">{o["created_at"]}</div>
+   40 |                         <div className="text-xs text-gray-600 mt-2">
+   41 |                             {o["shipping_address1"] + ", " + 
+o["shipping_city"] + ", " + o["shipping_state"] + " " + o["shipping_zip"]}
+      |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   42 |                         </div>
+   43 |                     </div>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/OrdersPage.cl.jac:41:30
+   39 |                         <div className="text-xs text-gray-500 
+mt-0.5">{o["created_at"]}</div>
+   40 |                         <div className="text-xs text-gray-600 mt-2">
+   41 |                             {o["shipping_address1"] + ", " + 
+o["shipping_city"] + ", " + o["shipping_state"] + " " + o["shipping_zip"]}
+      |                              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   42 |                         </div>
+   43 |                     </div>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/OrdersPage.cl.jac:41:30
+   39 |                         <div className="text-xs text-gray-500 
+mt-0.5">{o["created_at"]}</div>
+   40 |                         <div className="text-xs text-gray-600 mt-2">
+   41 |                             {o["shipping_address1"] + ", " + 
+o["shipping_city"] + ", " + o["shipping_state"] + " " + o["shipping_zip"]}
+      |                              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   42 |                         </div>
+   43 |                     </div>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/OrdersPage.cl.jac:41:30
+   39 |                         <div className="text-xs text-gray-500 
+mt-0.5">{o["created_at"]}</div>
+   40 |                         <div className="text-xs text-gray-600 mt-2">
+   41 |                             {o["shipping_address1"] + ", " + 
+o["shipping_city"] + ", " + o["shipping_state"] + " " + o["shipping_zip"]}
+      |                              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   42 |                         </div>
+   43 |                     </div>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/OrdersPage.cl.jac:41:30
+   39 |                         <div className="text-xs text-gray-500 
+mt-0.5">{o["created_at"]}</div>
+   40 |                         <div className="text-xs text-gray-600 mt-2">
+   41 |                             {o["shipping_address1"] + ", " + 
+o["shipping_city"] + ", " + o["shipping_state"] + " " + o["shipping_zip"]}
+      |                              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^
+   42 |                         </div>
+   43 |                     </div>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/OrdersPage.cl.jac:41:30
+   39 |                         <div className="text-xs text-gray-500 
+mt-0.5">{o["created_at"]}</div>
+   40 |                         <div className="text-xs text-gray-600 mt-2">
+   41 |                             {o["shipping_address1"] + ", " + 
+o["shipping_city"] + ", " + o["shipping_state"] + " " + o["shipping_zip"]}
+      |                              
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^
+   42 |                         </div>
+   43 |                     </div>
+✖ Error: error[E1053]: Cannot assign <Unknown> to parameter 'order_id' of type 
+str
+  --> pages/OrdersPage.cl.jac:49:72
+   47 |                         </span>
+   48 |                         {(<button
+   49 |                             onClick={lambda _e: MouseEvent { 
+do_cancel(o["id"]); }}
+      |                                                                        
+^^^^^^^
+   50 |                             className="text-xs text-red-600 
+hover:text-red-700 hover:underline"
+   51 |                         >Cancel</button>) if o["status"] in ["pending", 
+"processed"] else None}
+⚠ warning[W1036]: Generic type "list" used without type arguments, defaulting to
+"list[Any]"; consider adding explicit type arguments
+  --> pages/OrdersPage.cl.jac:7:17
+    5 | 
+    6 | def:pub OrdersPage() -> JsxElement {
+    7 |     has orders: list = [];
+      |                 ^^^^
+    8 |     has loading: bool = True;
+    9 | 
+⚠ warning[W3037]: Unnecessary '-> None' return type annotation on 'refresh'; 
+functions without a return statement implicitly return None 
+  --> pages/OrdersPage.cl.jac:10:28
+    8 |     has loading: bool = True;
+    9 | 
+   10 |     async def refresh() -> None {
+      |                            ^^^^
+   11 |         result = await list_orders("user_001");
+   12 |         orders = result if result else [];
+⚠ warning[W3037]: Unnecessary '-> None' return type annotation on 'do_cancel'; 
+functions without a return statement implicitly return None 
+  --> pages/OrdersPage.cl.jac:20:43
+   18 |     }
+   19 | 
+   20 |     async def do_cancel(order_id: str) -> None {
+      |                                           ^^^^
+   21 |         await cancel_order(order_id);
+   22 |         await refresh();
+✖ Error: error[E1053]: Cannot assign <Unknown> to parameter 'product_id' of type
+str
+  --> pages/ProductPage.cl.jac:18:36
+   16 | 
+   17 |     async can with entry {
+   18 |         result = await get_product(pid);
+      |                                    ^^^
+   19 |         product = result;
+   20 |         loading = False;
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> pages/ProductPage.cl.jac:43:19
+   41 |         return <div className="max-w-4xl mx-auto px-6 py-12">
+   42 |             <p className="text-gray-700">Product not found.</p>
+   43 |             <Link to="/" className="text-indigo-600 hover:underline mt-4
+inline-block">← Back to catalog</Link>
+      |                   ^^^^^^
+   44 |         </div>;
+   45 |     }
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> pages/ProductPage.cl.jac:43:26
+   41 |         return <div className="max-w-4xl mx-auto px-6 py-12">
+   42 |             <p className="text-gray-700">Product not found.</p>
+   43 |             <Link to="/" className="text-indigo-600 hover:underline mt-4
+inline-block">← Back to catalog</Link>
+      |                          
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   44 |         </div>;
+   45 |     }
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> pages/ProductPage.cl.jac:43:13
+   41 |         return <div className="max-w-4xl mx-auto px-6 py-12">
+   42 |             <p className="text-gray-700">Product not found.</p>
+   43 |             <Link to="/" className="text-indigo-600 hover:underline mt-4
+inline-block">← Back to catalog</Link>
+      |             
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   44 |         </div>;
+   45 |     }
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> pages/ProductPage.cl.jac:43:19
+   41 |         return <div className="max-w-4xl mx-auto px-6 py-12">
+   42 |             <p className="text-gray-700">Product not found.</p>
+   43 |             <Link to="/" className="text-indigo-600 hover:underline mt-4
+inline-block">← Back to catalog</Link>
+      |                   ^^^^^^
+   44 |         </div>;
+   45 |     }
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> pages/ProductPage.cl.jac:43:26
+   41 |         return <div className="max-w-4xl mx-auto px-6 py-12">
+   42 |             <p className="text-gray-700">Product not found.</p>
+   43 |             <Link to="/" className="text-indigo-600 hover:underline mt-4
+inline-block">← Back to catalog</Link>
+      |                          
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   44 |         </div>;
+   45 |     }
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> pages/ProductPage.cl.jac:43:13
+   41 |         return <div className="max-w-4xl mx-auto px-6 py-12">
+   42 |             <p className="text-gray-700">Product not found.</p>
+   43 |             <Link to="/" className="text-indigo-600 hover:underline mt-4
+inline-block">← Back to catalog</Link>
+      |             
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
+   44 |         </div>;
+   45 |     }
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> pages/ProductPage.cl.jac:48:15
+   46 | 
+   47 |     return <div className="max-w-4xl mx-auto px-6 py-8">
+   48 |         <Link to="/" className="text-sm text-indigo-600 
+hover:underline">← Back to catalog</Link>
+      |               ^^^^^^
+   49 | 
+   50 |         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> pages/ProductPage.cl.jac:48:22
+   46 | 
+   47 |     return <div className="max-w-4xl mx-auto px-6 py-8">
+   48 |         <Link to="/" className="text-sm text-indigo-600 
+hover:underline">← Back to catalog</Link>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   49 | 
+   50 |         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> pages/ProductPage.cl.jac:48:9
+   46 | 
+   47 |     return <div className="max-w-4xl mx-auto px-6 py-8">
+   48 |         <Link to="/" className="text-sm text-indigo-600 
+hover:underline">← Back to catalog</Link>
+      |         
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   49 | 
+   50 |         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+✖ Error: error[E1101]: Component 'Link' has no prop 'to'
+  --> pages/ProductPage.cl.jac:48:15
+   46 | 
+   47 |     return <div className="max-w-4xl mx-auto px-6 py-8">
+   48 |         <Link to="/" className="text-sm text-indigo-600 
+hover:underline">← Back to catalog</Link>
+      |               ^^^^^^
+   49 | 
+   50 |         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+✖ Error: error[E1101]: Component 'Link' has no prop 'className'
+  --> pages/ProductPage.cl.jac:48:22
+   46 | 
+   47 |     return <div className="max-w-4xl mx-auto px-6 py-8">
+   48 |         <Link to="/" className="text-sm text-indigo-600 
+hover:underline">← Back to catalog</Link>
+      |                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   49 | 
+   50 |         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+✖ Error: error[E1102]: Component 'Link' requires prop 'props'
+  --> pages/ProductPage.cl.jac:48:9
+   46 | 
+   47 |     return <div className="max-w-4xl mx-auto px-6 py-8">
+   48 |         <Link to="/" className="text-sm text-indigo-600 
+hover:underline">← Back to catalog</Link>
+      |         
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^
+   49 | 
+   50 |         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/ProductPage.cl.jac:70:42
+   68 |                                 <div>
+   69 |                                     <div className="text-sm font-medium 
+text-gray-900">
+   70 |                                         {v["color"] + " · " + v["size"]}
+      |                                          ^^^^^^^^^^^^^^^^^^
+   71 |                                     </div>
+   72 |                                     <div className="text-xs 
+text-gray-500 mt-0.5">
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/ProductPage.cl.jac:70:42
+   68 |                                 <div>
+   69 |                                     <div className="text-sm font-medium 
+text-gray-900">
+   70 |                                         {v["color"] + " · " + v["size"]}
+      |                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   71 |                                     </div>
+   72 |                                     <div className="text-xs 
+text-gray-500 mt-0.5">
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/ProductPage.cl.jac:73:42
+   71 |                                     </div>
+   72 |                                     <div className="text-xs 
+text-gray-500 mt-0.5">
+   73 |                                         {v["material"] + " · " + 
+str(v["stock_qty"]) + " in stock"}
+      |                                          ^^^^^^^^^^^^^^^^^^^^^
+   74 |                                     </div>
+   75 |                                 </div>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/ProductPage.cl.jac:73:42
+   71 |                                     </div>
+   72 |                                     <div className="text-xs 
+text-gray-500 mt-0.5">
+   73 |                                         {v["material"] + " · " + 
+str(v["stock_qty"]) + " in stock"}
+      |                                          
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   74 |                                     </div>
+   75 |                                 </div>
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> pages/ProductPage.cl.jac:73:42
+   71 |                                     </div>
+   72 |                                     <div className="text-xs 
+text-gray-500 mt-0.5">
+   73 |                                         {v["material"] + " · " + 
+str(v["stock_qty"]) + " in stock"}
+      |                                          
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   74 |                                     </div>
+   75 |                                 </div>
+⚠ warning[W1101]: Cannot import name 'useParams' from module '@jac/runtime'
+  --> pages/ProductPage.cl.jac:3:30
+    1 | """Product detail page: variants + add-to-cart."""
+    2 | 
+    3 | import from "@jac/runtime" { useParams, Link }
+      |                              ^^^^^^^^^
+    4 | sv import from ..services.catalog { get_product }
+    5 | sv import from ..services.cart { add_to_cart }
+⚠ warning[W2058]: Comparison to None should use 'is' or 'is not', not '=='
+  --> pages/ProductPage.cl.jac:21:12
+   19 |         product = result;
+   20 |         loading = False;
+   21 |         if product != None and len(product["variants"]) > 0 {
+      |            ^^^^^^^^^^^^^^^
+   22 |             selected_variant_id = product["variants"][0]["id"];
+   23 |         }
+⚠ warning[W2058]: Comparison to None should use 'is' or 'is not', not '=='
+  --> pages/ProductPage.cl.jac:40:8
+   38 |         return <div className="max-w-4xl mx-auto px-6 py-12 
+text-gray-500">Loading...</div>;
+   39 |     }
+   40 |     if product == None {
+      |        ^^^^^^^^^^^^^^^
+   41 |         return <div className="max-w-4xl mx-auto px-6 py-12">
+   42 |             <p className="text-gray-700">Product not found.</p>
+⚠ warning[W1036]: Generic type "list" used without type arguments, defaulting to
+"list[Any]"; consider adding explicit type arguments
+  --> pages/CatalogPage.cl.jac:8:21
+    6 | 
+    7 | def:pub CatalogPage() -> JsxElement {
+    8 |     has categories: list = [];
+      |                     ^^^^
+    9 |     has products: list = [];
+   10 |     has loading: bool = True;
+⚠ warning[W1036]: Generic type "list" used without type arguments, defaulting to
+"list[Any]"; consider adding explicit type arguments
+  --> pages/CatalogPage.cl.jac:9:19
+    7 | def:pub CatalogPage() -> JsxElement {
+    8 |     has categories: list = [];
+    9 |     has products: list = [];
+      |                   ^^^^
+   10 |     has loading: bool = True;
+   11 |     has selected_cat: str = "";
+⚠ warning[W3030]: Function has 8 parameters (threshold is 7) 
+  --> services/cart.sv.jac:131:17
+  129 | 
+  130 | 
+  131 | def:pub checkout(
+      |                 ^
+  132 |     user_id: str,
+  133 |     payment_method_id: str,
+✖ Error: error[E1032]: Type is Unknown, cannot access attribute "created_at"
+  --> services/reviews.sv.jac:86:55
+   84 | 
+   85 |     # created_at is stored as a string; use it directly for sorting 
+(same approach used elsewhere).
+   86 |     all_reviews = sorted(all_reviews, key=lambda r: r.created_at, 
+reverse=True);
+      |                                                       ^^^^^^^^^^
+   87 |     recent = [review_dict(r) for r in all_reviews[:limit]];
+   88 | 
+✖ Error: error[E1054]: No matching overload found for the function call with the
+given arguments
+  --> services/reviews.sv.jac:86:19
+   84 | 
+   85 |     # created_at is stored as a string; use it directly for sorting 
+(same approach used elsewhere).
+   86 |     all_reviews = sorted(all_reviews, key=lambda r: r.created_at, 
+reverse=True);
+      |                   
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+   87 |     recent = [review_dict(r) for r in all_reviews[:limit]];
+   88 | 
+✖ Error: error[E1055]: No matching overload found for method "__add__" with the 
+given arguments
+  --> services/orders.sv.jac:203:30
+  201 |         oi = find_order_item(o, oi_id);
+  202 |         if oi is None {
+  203 |             return {"error": "Order item " + oi_id + " not found", 
+"status": 404};
+      |                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  204 |         }
+  205 | 
+⚠ warning[W3030]: Function has 8 parameters (threshold is 7) 
+  --> services/users.sv.jac:122:23
+  120 | 
+  121 | 
+  122 | def:pub update_address(user_id: str, address_id: str, address1: str, 
+city: str, state: str, zip_code: str, address2: str = "", country: str = "USA") 
+-> dict {
+      |                       
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  123 |     ensure_seeded();
+  124 |     a = find_address(user_id, address_id);
+⚠ warning[W2003]: 'category_id' is defined but never used
+  --> services/catalog.sv.jac:85:23
+   83 | 
+   84 | 
+   85 | def:pub list_products(category_id: str = "") -> list {
+      |                       ^^^^^^^^^^^
+   86 |     ensure_seeded();
+   87 |     products = [?:Product];
+⚠ warning[W3037]: Unnecessary '-> None' return type annotation on 
+'ensure_seeded'; functions without a return statement implicitly return None 
+  --> services/catalog.sv.jac:7:24
+    5 | 
+    6 | 
+    7 | def ensure_seeded() -> None {
+      |                        ^^^^
+    8 |     if not [?:Category] {
+    9 |         seed_catalog();

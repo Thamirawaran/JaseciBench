@@ -1,7 +1,7 @@
 """Orders service: list, view, cancel, return, modify items, update status/address."""
 
 import from datetime { datetime }
-import from models { Order, OrderItem, Payment, Variant }
+import from models { Order, OrderItem, Payment, Variant, Product }
 import from services.catalog { ensure_seeded, find_variant }
 import from services.users { find_payment_method }
 
@@ -80,13 +80,128 @@ def find_order_item(o: Order, oi_id: str) -> OrderItem | None {
 }
 
 
-def:pub list_orders(user_id: str = "") -> list[dict] {
+def:pub list_orders(user_id: str = "", status: str = "") -> list[dict] {
     ensure_seeded();
     orders = [root() -->][?:Order];
     if user_id {
         orders = [o for o in orders if o.user_id == user_id];
     }
+    if status {
+        orders = [o for o in orders if o.status == status];
+    }
     return [order_dict(o, include_items=False) for o in orders];
+}
+
+
+def:pub pending_order_count(user_id: str = "") -> int {
+    ensure_seeded();
+    orders = [root() -->][?:Order];
+    if user_id {
+        orders = [o for o in orders if o.user_id == user_id];
+    }
+    return len([o for o in orders if o.status == "pending"]);
+}
+
+
+def:pub user_with_most_orders() -> str {
+    ensure_seeded();
+    counts: dict = {};
+    for o in [root() -->][?:Order] {
+        uid = o.user_id;
+        if uid in counts {
+            counts[uid] = counts[uid] + 1;
+        } else {
+            counts[uid] = 1;
+        }
+    }
+    top_uid = "";
+    top_count = -1;
+    for uid in counts {
+        c = counts[uid];
+        if c > top_count {
+            top_count = c;
+            top_uid = uid;
+        }
+    }
+    return top_uid;
+}
+
+
+def:pub recent_orders(limit: int = 10) -> list[dict] {
+    ensure_seeded();
+    orders = [root() -->][?:Order];
+    orders.sort(reverse=True);
+    if limit < 0 {
+        limit = 0;
+    }
+    if limit > len(orders) {
+        limit = len(orders);
+    }
+    return [order_dict(o, include_items=False) for o in orders[:limit]];
+}
+
+
+def:pub most_purchased_products(limit: int = 10) -> list[dict] {
+    ensure_seeded();
+
+    totals: dict = {};  # product_id -> total units sold
+    for oi in [root() -->][?:OrderItem] {
+        if oi.returned {
+            continue;
+        }
+        pid = "";
+        for p in [root() -->][?:Product] {
+            for v in [p -->][?:Variant] {
+                if v.id == oi.variant_id {
+                    pid = p.id;
+                    break;
+                }
+            }
+            if pid {
+                break;
+            }
+        }
+        if not pid {
+            continue;
+        }
+        if pid in totals {
+            totals[pid] = totals[pid] + oi.quantity;
+        } else {
+            totals[pid] = oi.quantity;
+        }
+    }
+
+    ranked = [];
+    for pid in totals {
+        p = None;
+        for prod in [root() -->][?:Product] {
+            if prod.id == pid {
+                p = prod;
+                break;
+            }
+        }
+        if p is None {
+            continue;
+        }
+        ranked.append({
+            "id": p.id,
+            "name": p.name,
+            "description": p.description,
+            "category_id": p.category_id,
+            "active": p.active,
+            "units_sold": totals[pid],
+        });
+    }
+
+    ranked.sort(key=lambda d: d["units_sold"], reverse=True);
+
+    if limit < 0 {
+        limit = 0;
+    }
+    if limit > len(ranked) {
+        limit = len(ranked);
+    }
+    return ranked[:limit];
 }
 
 

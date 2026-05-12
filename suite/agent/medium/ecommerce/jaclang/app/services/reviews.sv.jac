@@ -70,3 +70,21 @@ def:pub product_review_summary(product_id: str) -> dict {
     avg = sum([r.rating for r in reviews]) / len(reviews);
     return {"count": len(reviews), "average_rating": int(avg * 100) / 100.0};
 }
+
+
+def:pub recent_reviews(limit: int = 10) -> dict {
+    ensure_seeded();
+
+    all_reviews = [];
+    for p in [root() -->][?:Product] {
+        for r in [p -->][?:Review] {
+            all_reviews.append(r);
+        }
+    }
+
+    # created_at is stored as a string; use it directly for sorting (same approach used elsewhere).
+    all_reviews = sorted(all_reviews, key=lambda r: r.created_at, reverse=True);
+    recent = [review_dict(r) for r in all_reviews[:limit]];
+
+    return {"reviews": recent, "count": len(recent)};
+}

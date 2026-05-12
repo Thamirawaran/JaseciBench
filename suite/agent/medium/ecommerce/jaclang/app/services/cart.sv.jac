@@ -116,6 +116,18 @@ def:pub clear_cart(user_id: str) -> dict {
 }
 
 
+def:pub cart_total_quantity(user_id: str) -> int {
+    ensure_seeded();
+    total_qty = 0;
+    for ci in [root() -->][?:CartItem] {
+        if ci.user_id == user_id {
+            total_qty = total_qty + ci.quantity;
+        }
+    }
+    return total_qty;
+}
+
+
 def:pub checkout(
     user_id: str,
     payment_method_id: str,

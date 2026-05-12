@@ -113,9 +113,34 @@ def:pub search_products(q: str) -> list[dict] {
         if not p.active {
             continue;
         }
-        if q_lower in p.name.lower() or q_lower in p.description.lower() {
+        if q_lower in p.name.lower() {
             matches.append(product_dict(p));
         }
     }
     return matches;
+}
+
+
+# Alias endpoint (name-only search)
+def:pub search_by_name(q: str) -> list[dict] {
+    return search_products(q);
+}
+
+
+def:pub list_out_of_stock_products() -> list[dict] {
+    ensure_seeded();
+    out = [];
+    for p in [root() -->][?:Product] {
+        if not p.active {
+            continue;
+        }
+        variants = [p -->][?:Variant];
+        if not variants {
+            continue;
+        }
+        if all([v.stock_qty == 0 for v in variants]) {
+            out.append(product_dict(p));
+        }
+    }
+    return out;
 }

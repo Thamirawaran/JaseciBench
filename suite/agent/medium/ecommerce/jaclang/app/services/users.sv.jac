@@ -94,6 +94,21 @@ def:pub list_addresses(user_id: str) -> list[dict] {
 }
 
 
+def:pub get_default_address(user_id: str) -> dict | None {
+    ensure_seeded();
+    u = find_user(user_id);
+    if u is None {
+        return None;
+    }
+    for a in [u -->][?:Address] {
+        if a.is_default {
+            return address_dict(a);
+        }
+    }
+    return None;
+}
+
+
 def:pub add_address(user_id: str, address1: str, city: str, state: str, zip_code: str, address2: str = "", country: str = "USA") -> dict {
     ensure_seeded();
     u = find_user(user_id);
