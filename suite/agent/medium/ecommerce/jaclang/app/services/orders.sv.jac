@@ -1,9 +1,9 @@
 """Orders service: list, view, cancel, return, modify items, update status/address."""
 
 import from datetime { datetime }
-import from models { Order, OrderItem, Payment, Variant }
+import from models { Order, OrderItem, Payment, Variant, UserProfile }
 import from services.catalog { ensure_seeded, find_variant }
-import from services.users { find_payment_method }
+import from services.users { find_payment_method, user_dict }
 
 
 def find_order(order_id: str) -> Order | None {
@@ -87,6 +87,59 @@ def:pub list_orders(user_id: str = "") -> list[dict] {
         orders = [o for o in orders if o.user_id == user_id];
     }
     return [order_dict(o, include_items=False) for o in orders];
+}
+
+
+def:pub users_with_min_orders(min_count: int) -> list[dict] {
+    ensure_seeded();
+
+    users = [root() -->][?:UserProfile];
+    orders = [root() -->][?:Order];
+
+    # Count orders per user_id
+    counts: dict = {};
+    for o in orders {
+        uid = o.user_id;
+        counts[uid] = (counts[uid] if uid in counts else 0) + 1;
+    }
+
+    return [user_dict(u) for u in users if (counts[u.id] if u.id in counts else 0) >= min_count];
+}
+
+
+def:pub customers_by_recent_order() -> list[dict] {
+    ensure_seeded();
+
+    # Track newest order timestamp per user
+    newest: dict = {};  # user_id -> created_at
+    for o in [root() -->][?:Order] {
+        uid = o.user_id;
+        ts = o.created_at;
+        if uid not in newest or ts > newest[uid] {
+            newest[uid] = ts;
+        }
+    }
+
+    # Exclude users with no orders, and sort by newest order desc
+    users = [u for u in [root() -->][?:UserProfile] if u.id in newest];
+    key_fn = lambda(u: UserProfile) -> str { return newest[u.id]; };
+    users = sorted(users, key=key_fn, reverse=True);
+    return [user_dict(u) for u in users];
+}
+
+
+def:pub total_revenue() -> float {
+    ensure_seeded();
+
+    total = 0.0;
+    for p in [root() -->][?:Payment] {
+        if p.transaction_type == "payment" {
+            total = total + p.amount;
+        } elif p.transaction_type == "refund" {
+            total = total - p.amount;
+        }
+    }
+    return int(total * 100) / 100.0;
 }
 
 

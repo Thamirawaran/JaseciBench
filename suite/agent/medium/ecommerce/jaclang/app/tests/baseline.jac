@@ -5,9 +5,9 @@ that the candidate codebase compiles and the seed loaded correctly.
 Hidden grading tests live alongside each task in the vault.
 """
 
-import from services.catalog { list_categories, list_products, get_product, search_products }
+import from services.catalog { list_categories, list_products, get_product, search_products, update_variant_price, deactivate_product }
 import from services.users { get_profile, list_addresses, list_payment_methods }
-import from services.cart { get_cart }
+import from services.cart { get_cart, cart_cost_summary }
 import from services.orders { list_orders, get_order }
 import from services.reviews { list_reviews }
 
@@ -47,6 +47,20 @@ test "search_products matches name case-insensitively" {
     results = search_products("shirt");
     names = [p["name"] for p in results];
     assert "T-Shirt" in names;
+}
+
+
+test "deactivate_product hides product from list_products" {
+    out = deactivate_product("prod_001");
+    assert out["id"] == "prod_001";
+    assert not out["active"];
+
+    prods = list_products("");
+    ids = [p["id"] for p in prods];
+    assert "prod_001" not in ids;
+
+    p = get_product("prod_001");
+    assert p is None;
 }
 
 

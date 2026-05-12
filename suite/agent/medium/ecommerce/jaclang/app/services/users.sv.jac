@@ -84,6 +84,25 @@ def:pub get_profile(user_id: str) -> dict | None {
 }
 
 
+def:pub update_username(user_id: str, new_username: str) -> dict {
+    ensure_seeded();
+
+    u = find_user(user_id);
+    if u is None {
+        return {"error": "User not found", "status": 404};
+    }
+
+    for other in [root() -->][?:UserProfile] {
+        if other.id != user_id and other.username == new_username {
+            return {"error": "Username already taken", "status": 400};
+        }
+    }
+
+    u.username = new_username;
+    return user_dict(u);
+}
+
+
 def:pub list_addresses(user_id: str) -> list[dict] {
     ensure_seeded();
     u = find_user(user_id);
@@ -162,4 +181,72 @@ def:pub list_payment_methods(user_id: str) -> list[dict] {
         }
         for pm in [u -->][?:PaymentMethod]
     ];
+}
+
+
+def:pub add_payment_method(user_id: str, card_brand: str, last_four: str) -> dict {
+    ensure_seeded();
+    u = find_user(user_id);
+    if u is None {
+        return {"error": "User not found", "status": 404};
+    }
+
+    existing = [pm for pm in [u -->][?:PaymentMethod]];
+    pm_count = len(existing);
+    pm_id = "pm_" + str(pm_count + 1);
+
+    new_pm = PaymentMethod(
+        id=pm_id,
+        card_brand=card_brand,
+        last_four=last_four,
+        user_id=user_id,
+        is_default=False,
+    );
+    u ++> new_pm;
+
+    return {
+        "id": new_pm.id,
+        "user_id": new_pm.user_id,
+        "card_brand": new_pm.card_brand,
+        "last_four": new_pm.last_four,
+        "is_default": new_pm.is_default,
+    };
+}
+
+
+def:pub set_default_payment_method(user_id: str, payment_method_id: str) -> dict {
+    ensure_seeded();
+
+    u = find_user(user_id);
+    if u is None {
+        return {"error": "User not found", "status": 404};
+    }
+
+    pms = [pm for pm in [u -->][?:PaymentMethod]];
+    if len(pms) == 0 {
+        return {"error": "Payment method not found", "status": 404};
+    }
+
+    target: PaymentMethod | None = None;
+    for pm in pms {
+        if pm.id == payment_method_id {
+            target = pm;
+        }
+    }
+
+    if target is None {
+        return {"error": "Payment method not found", "status": 404};
+    }
+
+    for pm in pms {
+        pm.is_default = (pm.id == payment_method_id);
+    }
+
+    return {
+        "id": target.id,
+        "user_id": target.user_id,
+        "card_brand": target.card_brand,
+        "last_four": target.last_four,
+        "is_default": target.is_default,
+    };
 }

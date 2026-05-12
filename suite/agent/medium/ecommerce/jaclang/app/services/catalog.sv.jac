@@ -1,6 +1,6 @@
 """Catalog service: categories, products, variants, search."""
 
-import from models { Category, Product, Variant }
+import from models { Category, Product, Variant, Review }
 import from seed { seed_catalog }
 
 
@@ -118,4 +118,119 @@ def:pub search_products(q: str) -> list[dict] {
         }
     }
     return matches;
+}
+
+
+def:pub update_variant_price(variant_id: str, new_price: float) -> dict {
+    ensure_seeded();
+
+    if new_price < 0 {
+        return {"error": "new_price must be >= 0", "status": 400};
+    }
+
+    v = find_variant(variant_id);
+    if v is None {
+        return {"error": "variant not found", "status": 404};
+    }
+
+    v.price = new_price;
+    return variant_dict(v);
+}
+
+
+def:pub deactivate_product(product_id: str) -> dict {
+    ensure_seeded();
+
+    p = find_product(product_id);
+    if p is None {
+        return {"error": "product not found", "status": 404};
+    }
+
+    p.active = False;
+    return product_dict(p);
+}
+
+
+def:pub low_stock_products(threshold: int) -> list[dict] {
+    ensure_seeded();
+
+    if threshold < 0 {
+        return [];
+    }
+
+    low_stock = [];
+    for p in [root() -->][?:Product] {
+        if not p.active {
+            continue;
+        }
+        for v in [p -->][?:Variant] {
+            if v.stock_qty < threshold {
+                low_stock.append(product_dict(p));
+                break;
+            }
+        }
+    }
+
+    return low_stock;
+}
+
+
+def:pub product_count() -> int {
+    ensure_seeded();
+    total = 0;
+    for p in [root() -->][?:Product] {
+        if p.active {
+            total += 1;
+        }
+    }
+    return total;
+}
+
+
+def:pub average_product_price() -> float {
+    ensure_seeded();
+
+    total = 0.0;
+    count = 0;
+
+    for p in [root() -->][?:Product] {
+        if not p.active {
+            continue;
+        }
+        for v in [p -->][?:Variant] {
+            total += v.price;
+            count += 1;
+        }
+    }
+
+    if count == 0 {
+        return 0.0;
+    }
+    return total / count;
+}
+
+
+def:pub products_without_reviews() -> list[dict] {
+    ensure_seeded();
+
+    no_review_products = [];
+    for p in [root() -->][?:Product] {
+        if not p.active {
+            continue;
+        }
+
+        has_review = False;
+        for r in [root() -->][?:Review] {
+            if r.product_id == p.id {
+                has_review = True;
+                break;
+            }
+        }
+
+        if not has_review {
+            no_review_products.append(product_dict(p));
+        }
+    }
+
+    return no_review_products;
 }

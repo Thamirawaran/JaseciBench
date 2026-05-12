@@ -104,6 +104,24 @@ def:pub remove_from_cart(cart_item_id: str) -> dict {
 }
 
 
+def:pub cart_replace_variant(cart_item_id: str, new_variant_id: str) -> dict {
+    ensure_seeded();
+
+    ci = find_cart_item(cart_item_id);
+    if ci is None {
+        return {"error": "Cart item not found", "status": 404};
+    }
+
+    v = find_variant(new_variant_id);
+    if v is None {
+        return {"error": "Variant not found", "status": 404};
+    }
+
+    ci.variant_id = new_variant_id;
+    return cart_item_dict(ci, v);
+}
+
+
 def:pub clear_cart(user_id: str) -> dict {
     removed = 0;
     for ci in [root() -->][?:CartItem] {
@@ -113,6 +131,28 @@ def:pub clear_cart(user_id: str) -> dict {
         }
     }
     return {"cleared": removed};
+}
+
+
+def:pub cart_cost_summary(user_id: str) -> dict {
+    ensure_seeded();
+    unit_total = 0.0;
+    item_count = 0;
+
+    for ci in [root() -->][?:CartItem] {
+        if ci.user_id != user_id {
+            continue;
+        }
+        v = find_variant(ci.variant_id);
+        if v is None {
+            continue;
+        }
+        unit_total = unit_total + (v.price * ci.quantity);
+        item_count = item_count + 1;
+    }
+
+    unit_total_rounded = int(unit_total * 100) / 100.0;
+    return {"unit_total": unit_total_rounded, "item_count": item_count};
 }
 
 
