@@ -29,6 +29,22 @@ def:pub list_reviews(product_id: str) -> dict {
 }
 
 
+def:pub list_user_reviews(user_id: str) -> dict {
+    ensure_seeded();
+
+    reviews = [];
+    for prod in [root() -->][?:Product] {
+        for r in [prod -->][?:Review] {
+            if r.user_id == user_id {
+                reviews.append(review_dict(r));
+            }
+        }
+    }
+
+    return {"reviews": reviews, "count": len(reviews)};
+}
+
+
 def:pub add_review(product_id: str, user_id: str, rating: int, title: str = "", body: str = "") -> dict {
     ensure_seeded();
     p = find_product(product_id);

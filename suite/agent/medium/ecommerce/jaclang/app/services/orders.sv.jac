@@ -80,13 +80,50 @@ def find_order_item(o: Order, oi_id: str) -> OrderItem | None {
 }
 
 
-def:pub list_orders(user_id: str = "") -> list[dict] {
+def:pub list_orders(user_id: str = "", from_date: str = "", to_date: str = "") -> list[dict] {
     ensure_seeded();
     orders = [root() -->][?:Order];
+
     if user_id {
         orders = [o for o in orders if o.user_id == user_id];
     }
+
+    # ISO-style timestamps compare correctly as strings when zero-padded.
+    if from_date {
+        orders = [o for o in orders if o.created_at >= from_date];
+    }
+    if to_date {
+        orders = [o for o in orders if o.created_at <= to_date];
+    }
+
     return [order_dict(o, include_items=False) for o in orders];
+}
+
+
+def:pub get_user_spend(user_id: str) -> dict {
+    ensure_seeded();
+
+    total_paid = 0.0;
+    total_refunded = 0.0;
+
+    for o in [root() -->][?:Order] {
+        if o.user_id != user_id {
+            continue;
+        }
+        for p in [o -->][?:Payment] {
+            if p.transaction_type == "payment" {
+                total_paid = total_paid + p.amount;
+            } elif p.transaction_type == "refund" {
+                total_refunded = total_refunded + p.amount;
+            }
+        }
+    }
+
+    return {
+        "total_paid": total_paid,
+        "total_refunded": total_refunded,
+        "net_spent": total_paid - total_refunded,
+    };
 }
 
 

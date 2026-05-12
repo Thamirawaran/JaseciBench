@@ -5,11 +5,11 @@ that the candidate codebase compiles and the seed loaded correctly.
 Hidden grading tests live alongside each task in the vault.
 """
 
-import from services.catalog { list_categories, list_products, get_product, search_products }
+import from services.catalog { list_categories, list_products, get_product, search_products, top_rated_products }
 import from services.users { get_profile, list_addresses, list_payment_methods }
 import from services.cart { get_cart }
-import from services.orders { list_orders, get_order }
-import from services.reviews { list_reviews }
+import from services.orders { list_orders, get_order, get_user_spend }
+import from services.reviews { list_reviews, list_user_reviews }
 
 
 # Catalog -------------------------------------------------------------
@@ -47,6 +47,15 @@ test "search_products matches name case-insensitively" {
     results = search_products("shirt");
     names = [p["name"] for p in results];
     assert "T-Shirt" in names;
+}
+
+
+test "top_rated_products sorts by average rating desc" {
+    out = top_rated_products(3);
+    assert len(out) == 3;
+    # Seed has prod_001 avg 4.5, prod_005 avg 5.0, others 0.0
+    assert out[0]["id"] == "prod_005";
+    assert out[1]["id"] == "prod_001";
 }
 
 
@@ -110,6 +119,24 @@ test "get_order returns full detail" {
 }
 
 
+test "get_user_spend returns totals and net for a seeded user" {
+    out = get_user_spend("user_001");
+    assert "total_paid" in out;
+    assert "total_refunded" in out;
+    assert "net_spent" in out;
+    assert out["net_spent"] == out["total_paid"] - out["total_refunded"];
+    assert out["total_paid"] > 0.0;
+}
+
+
+test "get_user_spend returns zeros for a user with no orders" {
+    out = get_user_spend("user_no_orders");
+    assert out["total_paid"] == 0.0;
+    assert out["total_refunded"] == 0.0;
+    assert out["net_spent"] == 0.0;
+}
+
+
 # Reviews -------------------------------------------------------------
 
 test "list_reviews returns two reviews for T-Shirt" {
@@ -121,4 +148,17 @@ test "list_reviews returns two reviews for T-Shirt" {
 test "list_reviews returns empty for product with no reviews" {
     out = list_reviews("prod_002");
     assert out["count"] == 0;
+}
+
+
+test "list_user_reviews returns all reviews for a user across products" {
+    out = list_user_reviews("user_001");
+    assert out["count"] == 1;
+}
+
+
+test "list_user_reviews returns empty for user with no reviews" {
+    out = list_user_reviews("user_999");
+    assert out["count"] == 0;
+    assert out["reviews"] == [];
 }

@@ -1,6 +1,6 @@
 """Catalog service: categories, products, variants, search."""
 
-import from models { Category, Product, Variant }
+import from models { Category, Product, Variant, Review }
 import from seed { seed_catalog }
 
 
@@ -33,6 +33,9 @@ def variant_dict(v: Variant) -> dict {
 
 
 def product_dict(p: Product, include_variants: bool = True) -> dict {
+    variants_nodes = [p -->][?:Variant];
+    total_stock = sum([v.stock_qty for v in variants_nodes]);
+
     if not include_variants {
         return {
             "id": p.id,
@@ -40,15 +43,18 @@ def product_dict(p: Product, include_variants: bool = True) -> dict {
             "description": p.description,
             "category_id": p.category_id,
             "active": p.active,
+            "total_stock": total_stock,
         };
     }
-    variants = [variant_dict(v) for v in [p -->][?:Variant]];
+
+    variants = [variant_dict(v) for v in variants_nodes];
     return {
         "id": p.id,
         "name": p.name,
         "description": p.description,
         "category_id": p.category_id,
         "active": p.active,
+        "total_stock": total_stock,
         "variants": variants,
     };
 }
@@ -118,4 +124,25 @@ def:pub search_products(q: str) -> list[dict] {
         }
     }
     return matches;
+}
+
+
+def:pub top_rated_products(limit: int = 10) -> list[dict] {
+    ensure_seeded();
+
+    scored = [];
+    for p in [root() -->][?:Product] {
+        if not p.active {
+            continue;
+        }
+        reviews = [r for r in [p -->][?:Review]];
+        avg = 0.0;
+        if reviews {
+            avg = sum([r.rating for r in reviews]) / len(reviews);
+        }
+        scored.append({"avg": avg, "product": product_dict(p)});
+    }
+
+    scored.sort(key=lambda(x: dict) -> float { return x["avg"]; }, reverse=True);
+    return [x["product"] for x in scored][:limit];
 }
