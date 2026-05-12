@@ -29,6 +29,7 @@ def order_dict(o: Order, include_items: bool = True) -> dict {
             "shipping_zip": o.shipping_zip,
             "shipping_country": o.shipping_country,
             "created_at": o.created_at,
+            "item_count": len([o -->][?:OrderItem]),
         };
     }
     items = [
@@ -106,7 +107,22 @@ def:pub cancel_order(order_id: str) -> dict {
     if o is None {
         return {"error": "Order not found", "status": 404};
     }
+    if o.status != "pending" {
+        return {
+            "error": "Only pending orders can be cancelled (current status: " + o.status + ")",
+            "status": 400,
+        };
+    }
 
+    # Restore stock for each order item.
+    for oi in [o -->][?:OrderItem] {
+        v = find_variant(oi.variant_id);
+        if v is not None {
+            v.stock_qty = v.stock_qty + oi.quantity;
+        }
+    }
+
+    # Issue refunds for each existing payment.
     now_str = str(datetime.now());
     refund_seq = 0;
     for pay in [o -->][?:Payment] {
