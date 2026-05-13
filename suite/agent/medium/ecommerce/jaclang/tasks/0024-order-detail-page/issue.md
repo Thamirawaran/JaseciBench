@@ -39,14 +39,3 @@ inside the existing `<Routes>` block, after the `/orders` route.
 ### `OrdersPage.cl.jac`
 
 Wrap the order id text in a `<Link to={"/orders/" + o["id"]}>`.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/orders>, click an order id, see the
-detail page.

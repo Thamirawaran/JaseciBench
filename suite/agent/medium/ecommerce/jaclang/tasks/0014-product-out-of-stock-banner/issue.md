@@ -21,14 +21,3 @@ the variant list. The banner must:
 - Use a destructive/warning color palette (a `bg-red-` background or
   `text-red-` foreground class is fine).
 - Not render at all when at least one variant has stock.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/products/prod_001> (T-Shirt has stock).
-Then visit a product whose variants you have set to 0 stock.

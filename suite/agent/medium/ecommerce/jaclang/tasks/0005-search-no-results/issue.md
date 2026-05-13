@@ -29,13 +29,3 @@ After the user searches for "xyz123" (no products match):
 ```
 No products match "xyz123".
 ```
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/search> and search for an unlikely string.

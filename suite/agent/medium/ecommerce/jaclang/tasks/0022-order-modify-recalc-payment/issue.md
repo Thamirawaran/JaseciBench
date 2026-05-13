@@ -32,8 +32,3 @@ for pay in [o -->][?:Payment] {
 
 The 404 (order not found) and 400 (status not pending) guards must keep
 working. Refund payments must NOT be touched.
-
-## How to verify
-
-Take a pending order, modify an item's quantity, then GET the order
-and verify `total == sum(payments where type == "payment")`.

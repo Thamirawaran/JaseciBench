@@ -30,23 +30,3 @@ existing keys (`id`, `name`, `description`, `category_id`, `active`,
 Read `product["min_price"]` and render it as `"$" + str(min_price)`
 inside a bold `<span>`. The card layout should keep the existing
 "N variants" hint to the right.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/> and confirm every catalog card displays
-both the price and the variant count.
-
-A backend smoke test:
-
-```bash
-curl -s -X POST http://localhost:9000/function/list_products \
-    -H "Content-Type: application/json" -d '{}' | jq '.data.result[0].min_price'
-# expected: 19.99
-```

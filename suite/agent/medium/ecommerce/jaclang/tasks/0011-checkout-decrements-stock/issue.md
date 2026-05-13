@@ -24,13 +24,3 @@ never go negative through this path.
 Variant `var_001` starts with `stock_qty = 50`. After a checkout that
 includes 3 of `var_001`, `get_product("prod_001")` should report
 `var_001.stock_qty = 47`.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-```
-
-All 16 baseline tests must pass after your fix.

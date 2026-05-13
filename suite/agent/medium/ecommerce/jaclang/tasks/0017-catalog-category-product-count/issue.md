@@ -26,20 +26,3 @@ nodes attached to root with matching `category_id` and `active=True`.
 
 Each category button label becomes `name + " (" + str(product_count) + ")"`.
 The "All" button is unchanged.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-```
-
-Backend smoke (Technology has 2 products: Keyboard, Headphones):
-
-```bash
-curl -s -X POST http://localhost:9000/function/list_categories \
-    -H "Content-Type: application/json" -d '{}' \
-    | jq '.data.result[] | select(.id=="cat_004").product_count'
-# expected: 2
-```

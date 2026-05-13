@@ -20,14 +20,3 @@ When `len(orders) == 0`, render an empty-state block that contains:
 
 The non-empty branch (the order list and cancel buttons) must
 continue to render as today.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/orders> with a brand-new user (no
-seeded orders) and confirm the CTA renders.

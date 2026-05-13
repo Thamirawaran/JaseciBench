@@ -17,14 +17,3 @@ Inside the row, between the quantity controls and the Remove button,
 render a small bold right-aligned `<div>` showing
 `"$" + str(item["subtotal"])`. The server already exposes
 `subtotal = price * quantity` on each cart item.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/cart> and confirm each row displays the
-subtotal.

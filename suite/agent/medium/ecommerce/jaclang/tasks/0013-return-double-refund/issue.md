@@ -23,15 +23,3 @@ When the caller asks to return an item that has already been returned
 without mutating any state, issuing a refund, or restoring stock.
 The 404 (item not in order) and 400 (order not delivered) checks must
 still work.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-```
-
-The seeded order `W0000004` already has `oi_004.returned = True`.
-Calling `return_items("W0000004", ["oi_004"], "pm_001")` must return
-the 400 error above, not refund again.

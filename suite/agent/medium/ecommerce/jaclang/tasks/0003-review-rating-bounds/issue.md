@@ -30,12 +30,3 @@ add_review("prod_001", "user_001", 6, "great", "")
 add_review("prod_001", "user_001", 5, "great", "")
 => {"id": "rev_0004", "rating": 5, ...}
 ```
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac test tests/baseline.jac
-```
-
-All 16 baseline tests must pass after your fix.

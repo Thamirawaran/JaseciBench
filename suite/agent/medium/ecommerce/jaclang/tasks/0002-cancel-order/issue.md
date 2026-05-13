@@ -32,12 +32,3 @@ cancel_order("W0000003")
 ```
 
 The pending order `W0000001` must still cancel successfully.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac test tests/baseline.jac
-```
-
-All 16 baseline tests must pass after your fix.

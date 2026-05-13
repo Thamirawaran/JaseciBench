@@ -22,17 +22,3 @@ When `len(items) == 0`, the page must show:
 
 The non-empty state must continue to render the items, total, and
 checkout button as today.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/cart> with a brand new user (one whose
-cart has no items) and confirm the empty-state UI renders.
-
-The grading oracle scans the source for the expected tokens, so
-your phrasing can vary as long as the patterns are present.

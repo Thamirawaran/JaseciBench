@@ -38,12 +38,3 @@ Alice's seed cart has 1 item (var_015 at $79.99, quantity 1):
 
 After adding a second variant at $24.99 with quantity 3, the total
 should become `79.99 + (24.99 * 3) = 154.96`, not `79.99 + 24.99 = 104.98`.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac test tests/baseline.jac
-```
-
-All 16 baseline tests must pass after your fix.

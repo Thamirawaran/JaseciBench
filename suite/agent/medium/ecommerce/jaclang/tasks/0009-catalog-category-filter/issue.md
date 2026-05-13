@@ -29,20 +29,3 @@ When `category_id` is non-empty, return only products whose
 - Render an "All" button (clears the filter) plus one button per
   category from `categories`. The currently selected button gets a
   visually distinct style.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-```
-
-Backend smoke (only Technology products):
-
-```bash
-curl -s -X POST http://localhost:9000/function/list_products \
-    -H "Content-Type: application/json" -d '{"category_id":"cat_004"}' \
-    | jq '.data.result | length'
-# expected: 2 (Keyboard, Headphones)
-```

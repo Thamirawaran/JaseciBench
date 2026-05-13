@@ -30,12 +30,3 @@ When `product["review_count"] > 0`, render a small line containing the
 review_count and average_rating. The phrase or symbol used is up to you;
 the grader looks for `average_rating` and `review_count` references in
 the source.
-
-## How to verify
-
-```bash
-curl -s -X POST http://localhost:9000/function/list_products \
-    -H "Content-Type: application/json" -d '{}' \
-    | jq '.data.result[] | select(.id=="prod_001") | {average_rating, review_count}'
-# expected: average_rating=4.5, review_count=2
-```

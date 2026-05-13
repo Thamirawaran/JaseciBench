@@ -28,20 +28,3 @@ number of `OrderItem` nodes attached to the order
 
 Render `str(o["item_count"]) + " items"` somewhere inside the order
 row (a small muted line under the address is fine).
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-```
-
-Backend smoke:
-
-```bash
-curl -s -X POST http://localhost:9000/function/list_orders \
-    -H "Content-Type: application/json" -d '{"user_id":"user_001"}' \
-    | jq '.data.result[].item_count'
-# expected: 1, 1
-```

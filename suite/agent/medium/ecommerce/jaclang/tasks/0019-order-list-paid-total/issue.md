@@ -27,13 +27,3 @@ to the order, where `transaction_type == "payment"` is added and
 
 Render a small line under the address showing
 `"Paid: $" + str(o["total_paid"])`.
-
-## How to verify
-
-```bash
-curl -s -X POST http://localhost:9000/function/list_orders \
-    -H "Content-Type: application/json" -d '{"user_id":"user_001"}' \
-    | jq '.data.result[] | {id, total_paid}'
-# W0000001: 39.98 (one payment, no refunds)
-# W0000004: 0.00 (one payment 89.99, one refund 89.99)
-```

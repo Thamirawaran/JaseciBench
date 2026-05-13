@@ -26,16 +26,3 @@ if v is not None {
 The refund and status flip should run after the stock restore. The
 404 (order not found) and 400 (non-pending status) guards must keep
 working. A successful cancel still returns the updated order dict.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-```
-
-## Example
-
-A pending order with 2 of `var_001` (current stock 50): after a
-successful cancel, `var_001.stock_qty` must equal 52.

@@ -36,14 +36,3 @@ of filters that the caller supplies).
 - Add two `<input>` fields for min and max price (text inputs that the
   client converts to floats).
 - The form submit calls `search_products(query, category_id, min_p, max_p)`.
-
-## How to verify
-
-```bash
-# Tech category, min price $80
-curl -s -X POST http://localhost:9000/function/search_products \
-    -H "Content-Type: application/json" \
-    -d '{"q":"","category_id":"cat_004","min_price":80.0,"max_price":0.0}' \
-    | jq '.data.result[].name'
-# expected: ["Keyboard", "Headphones"]
-```

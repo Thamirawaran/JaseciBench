@@ -27,14 +27,3 @@ calls `get_cart` on mount.
 
 The base `get_cart` already returns a `count` field; no server change
 is required.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/> and confirm the Cart link in the header
-shows a count badge (alice's seeded cart has 1 item).

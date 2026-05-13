@@ -26,14 +26,3 @@ itself is rendered with a plain `text-xs text-gray-600` className.
 - The status badge in the order list renders as a rounded pill with the
   appropriate background color (use `rounded-full`, padding like
   `px-2.5 py-1`, and the color classes returned by `status_color`).
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac start main.jac --port 9000
-```
-
-Open <http://localhost:9000/orders> and confirm each order's status
-shows as a colored pill matching the table above.

@@ -28,20 +28,3 @@ they are.
 Render the page header as `"Shopping Cart (" + str(count) + " items)"`,
 where `count` comes from the server response. Empty cart should show
 `"Shopping Cart (0 items)"`.
-
-## How to verify
-
-```bash
-cd suite/agent/medium/ecommerce/jaclang/app
-jac check main.jac
-jac test tests/baseline.jac
-```
-
-Backend smoke:
-
-```bash
-curl -s -X POST http://localhost:9000/function/get_cart \
-    -H "Content-Type: application/json" -d '{"user_id":"user_001"}' \
-    | jq '.data.result.count'
-# expected: 1 (alice has the seeded coffee maker)
-```
