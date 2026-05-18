@@ -20,3 +20,16 @@ existing cart-line plus the incoming `quantity`.
 - Otherwise: if a line exists, increment its quantity; if not, create
   a new line.
 - The 404 (variant not found) and quantity<1 guards must keep working.
+
+## Examples
+
+User 5 of `var_001` (stock 10) calls `add_to_cart(user_001, var_001, 8)`:
+- Reject with `{"error": "Insufficient stock", "status": 400}`.
+
+User 5 of `var_001` (stock 10) calls `add_to_cart(user_001, var_001, 3)`:
+- Cart line becomes `quantity=8`.
+
+## Out of scope
+
+Do not change `update_cart_item` or `checkout`. Those endpoints have
+their own (correct) stock checks.

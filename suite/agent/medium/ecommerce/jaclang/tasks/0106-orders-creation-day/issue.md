@@ -1,8 +1,3 @@
 # Creation day on orders rows
 
-In `app/services/orders.sv.jac`, `order_dict` (in both branches)
-should include a string field `created_day` equal to
-`o.created_at[0:10]` (the YYYY-MM-DD prefix).
-
-In `app/pages/OrdersPage.cl.jac`, render `o["created_day"]` on
-each row.
+In `app/services/orders.sv.jac`, `order_dict` (both branches) includes string `created_day = o.created_at[0:10]`. In `app/pages/OrdersPage.cl.jac`, render `o["created_day"]` on each row.

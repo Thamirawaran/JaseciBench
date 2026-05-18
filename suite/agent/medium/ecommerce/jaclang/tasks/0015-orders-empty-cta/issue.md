@@ -20,3 +20,16 @@ When `len(orders) == 0`, render an empty-state block that contains:
 
 The non-empty branch (the order list and cancel buttons) must
 continue to render as today.
+
+## Examples
+
+A user with zero orders (`list_orders("new_user") == []`):
+- Renders "No orders yet." and a "Browse products" Link to "/".
+
+A user with one or more orders:
+- Renders the order list. Empty-state block is NOT rendered.
+
+## Out of scope
+
+Do not change `list_orders` or any server endpoint. The empty state
+is a client-side rendering branch on `len(orders) == 0`.

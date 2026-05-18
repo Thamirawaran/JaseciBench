@@ -22,3 +22,17 @@ When `len(items) == 0`, the page must show:
 
 The non-empty state must continue to render the items, total, and
 checkout button as today.
+
+## Examples
+
+Empty cart for a user with no items:
+- Renders the phrase "Your cart is empty." and a Browse products link.
+
+Cart with one item:
+- Renders the items list, total, and checkout button as today; the
+  empty-state block is NOT rendered.
+
+## Out of scope
+
+Do not change `get_cart`, `add_to_cart`, or any server endpoint. The
+empty state is purely a client-side rendering branch.

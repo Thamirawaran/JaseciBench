@@ -17,3 +17,16 @@ Inside the row, between the quantity controls and the Remove button,
 render a small bold right-aligned `<div>` showing
 `"$" + str(item["subtotal"])`. The server already exposes
 `subtotal = price * quantity` on each cart item.
+
+## Examples
+
+A row with `price=19.99` and `quantity=3`:
+- Server returns `subtotal=59.97`. Cell renders `$59.97`.
+
+A row with `price=10.0` and `quantity=1`:
+- Server returns `subtotal=10.0`. Cell renders `$10.0`.
+
+## Out of scope
+
+Do not change `get_cart` or compute the subtotal client-side. Use
+the existing `item["subtotal"]` field. Do not change the Total panel.

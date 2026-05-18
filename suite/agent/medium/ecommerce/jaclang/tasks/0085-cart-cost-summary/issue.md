@@ -1,6 +1,3 @@
 # Cart cost summary
 
-`cart_cost_summary(user_id) -> dict` in cart. Returns
-`{"unit_total": ..., "item_count": ...}` where `unit_total` is the
-sum of `price * quantity` and `item_count` is the number of line
-items.
+Add `cart_cost_summary(user_id) -> {"subtotal", "tax", "grand_total"}` to `app/services/cart.sv.jac`. Tax is 8% of subtotal; grand_total is subtotal + tax. All floats rounded to 2 decimals.
