@@ -7,7 +7,7 @@ Jac implementation of the JaseciBench e-commerce CodeAgentEval benchmark.
 ```
 jaclang/
 ├── app/      # Reference application (read-only; agents edit a working copy)
-└── tasks/    # Per-task descriptions (issue.md, meta.public.json), coming soon
+└── tasks/    # Per-task descriptions (issue.md per task; 120 tasks across 4×3 grid)
 ```
 
 See [`app/README.md`](app/README.md) for the architecture, endpoints,
