@@ -87,6 +87,7 @@ def:pub seed_catalog() -> None {
     u_alice ++> Address(id="addr_001", user_id="user_001", address1="123 Main St", city="New York",
         state="NY", zip_code="10001", country="USA", is_default=True);
     u_alice ++> PaymentMethod(id="pm_001", user_id="user_001", card_brand="Visa", last_four="4242", is_default=True);
+    u_alice ++> PaymentMethod(id="pm_004", user_id="user_001", card_brand="Amex", last_four="9999", is_default=False);
 
     u_bob = UserProfile(id="user_002", username="bob", email="bob@example.com",
         first_name="Bob", last_name="Smith");
@@ -158,6 +159,19 @@ def:pub seed_catalog() -> None {
     o5 ++> OrderItem(id="oi_005", quantity=2, price_snapshot=24.99, variant_id="var_004");
     o5 ++> Payment(id="pay_006", amount=49.98, transaction_type="refund",
         payment_method_id="pm_002", created_at="2024-01-19T14:30:00");
+
+    # o6: a shipped order so tasks like 0036-orders-mark-shipped and
+    # 0053-orders-by-status can observe the status without mutating first.
+    # Placed on bob with a created_at that doesn't disturb the existing
+    # per-user "most recent order" ordering used by 0060.
+    o6 = Order(id="W0000006", user_id="user_002", status="shipped",
+        shipping_address1="456 Oak Ave", shipping_city="Los Angeles",
+        shipping_state="CA", shipping_zip="90001", shipping_country="USA",
+        created_at="2024-01-17T15:00:00");
+    root() ++> o6;
+    o6 ++> OrderItem(id="oi_006", quantity=1, price_snapshot=129.99, variant_id="var_017");
+    o6 ++> Payment(id="pay_007", amount=129.99, transaction_type="payment",
+        payment_method_id="pm_002", created_at="2024-01-17T15:00:00");
 
     ci = CartItem(id="ci_001", user_id="user_001", variant_id="var_015", quantity=1);
     root() ++> ci;

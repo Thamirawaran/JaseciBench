@@ -1,4 +1,10 @@
-"""E-commerce nodes and edges."""
+"""E-commerce graph data model.
+
+Only node types are declared; all relationships use Jac's default
+edge (`++>`). If a future task needs a typed edge (e.g. distinguishing
+`User-->Order` from `Order-->OrderItem`), add an `edge` declaration
+here.
+"""
 
 node Category {
     has id: str;

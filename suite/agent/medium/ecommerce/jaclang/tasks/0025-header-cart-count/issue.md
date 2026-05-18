@@ -19,11 +19,13 @@ calls `get_cart` on mount.
 - Add `sv import from ..services.cart { get_cart }`.
 - Add `has cart_count: int = 0`.
 - In `async can with entry`, call `await get_cart("user_001")` and
-  store the `count` field in `cart_count`.
+  derive `cart_count` from the result. `get_cart` returns
+  `{"items": items, "total": total}`, so use `len(result["items"])`.
+  (Task 0008 adds a `count` field to `get_cart`; do not rely on it
+  being present.)
 - Render a small badge `<span>` next to the existing `Cart` label
   when `cart_count > 0` (any pill-shaped Tailwind palette is fine).
 
 ### Server
 
-The base `get_cart` already returns a `count` field; no server change
-is required.
+No server change is required.
