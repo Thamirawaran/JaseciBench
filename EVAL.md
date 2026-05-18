@@ -32,8 +32,8 @@ The script dispatches the vault's grading workflow, polls until done, and prints
 | Suite | Path | Tasks |
 |---|---|---:|
 | Calculator (basic) | `suite/agent/basic/calculator/jaclang` | 3 |
-| Ecommerce (medium) | `suite/agent/medium/ecommerce/jaclang` | 25 |
-| **Total** | | **28** |
+| Ecommerce (medium) | `suite/agent/medium/ecommerce/jaclang` | 120 |
+| **Total** | | **123** |
 
 Each suite has:
 - `app/` - the codebase the agent edits (compilable Jac fullstack app)
