@@ -1,0 +1,206 @@
+#!/usr/bin/env python3
+"""
+jasecibench grade-isolated: per-task local grading.
+
+Grades a directory of per-task snapshots (produced by the runner's
+isolated mode) against the vault's hidden tests + scoring rubric. Prints
+a per-task PASS/FAIL table and per-tier / per-layer roll-ups.
+
+Unlike `scripts/grade` (which dispatches the vault's grading workflow
+for a single cumulative-state SHA), this runs entirely locally and needs
+a clone of JaseciBench-vault on disk.
+
+Usage
+-----
+    ./scripts/grade-isolated \\
+        --snapshots /tmp/snapshots \\
+        --suite     medium/ecommerce/jaclang \\
+        --vault     ~/vault \\
+        [--output   /tmp/grades.json]
+
+Layout expected
+---------------
+    snapshots/
+      0001-cart-total/
+        main.jac
+        services/
+        ...
+      0002-cancel-order/
+        ...
+
+Each subdir must look like an app/ root (the snapshot the runner wrote).
+The vault must be checked out at --vault and must contain the matching
+tasks/agent/<suite>/ directories.
+"""
+
+import argparse
+import json
+import os
+import subprocess
+import sys
+from collections import defaultdict
+from pathlib import Path
+
+
+def _grade_one(vault: Path, app_key: str, task_id: str, snapshot: Path) -> dict | None:
+    """Run the oracle on one snapshot. Returns parsed JSON or None on parse failure."""
+    proc = subprocess.run(
+        ["jac", "run", "oracle/score.jac", "--",
+         "--app", app_key,
+         "--task", task_id,
+         "--codebase", str(snapshot),
+         "--vault", str(vault)],
+        cwd=str(vault),
+        capture_output=True,
+        text=True,
+        timeout=600,
+    )
+    raw = (proc.stdout or "") + "\n" + (proc.stderr or "")
+    js = raw.find("{")
+    if js == -1:
+        return None
+    try:
+        return json.loads(raw[js:])
+    except json.JSONDecodeError:
+        return None
+
+
+_LAYER = {"1": "sv", "2": "cl", "3": "sv+cl"}
+
+
+def _derive_tier_layer(task_id: str) -> tuple[str, str]:
+    """Tier and layer from the leading 4-digit task id.
+
+    Shared JaseciBench format: <tier_digit><layer_digit><sequence_NN>.
+    Tier digit 1 = easiest within the app; tier semantics are per-app.
+    Layer digit 1=sv, 2=cl, 3=sv+cl.
+    """
+    if len(task_id) < 4 or not task_id[:4].isdigit():
+        return "?", "?"
+    tier_digit, layer_digit = task_id[0], task_id[1]
+    if tier_digit == "0" or layer_digit not in _LAYER:
+        return "?", "?"
+    return f"T{tier_digit}", _LAYER[layer_digit]
+
+
+def main() -> None:
+    p = argparse.ArgumentParser(description="Grade JaseciBench isolated snapshots locally.")
+    p.add_argument("--snapshots", required=True, help="Directory of per-task snapshots.")
+    p.add_argument("--suite", required=True,
+                   help="Suite key matching vault layout, e.g. medium/ecommerce/jaclang.")
+    p.add_argument("--vault", required=True, help="Path to a JaseciBench-vault clone.")
+    p.add_argument("--output", default=None,
+                   help="Optional path to write the full grade report as JSON.")
+    args = p.parse_args()
+
+    snapshots_root = Path(args.snapshots).resolve()
+    vault = Path(args.vault).resolve()
+
+    if not snapshots_root.is_dir():
+        sys.exit(f"--snapshots {snapshots_root} is not a directory")
+    if not vault.is_dir():
+        sys.exit(f"--vault {vault} is not a directory")
+    if not (vault / "oracle" / "score.jac").is_file():
+        sys.exit(f"{vault} does not look like a JaseciBench-vault clone "
+                 "(no oracle/score.jac)")
+
+    tasks_dir = vault / "tasks" / "agent" / args.suite
+    if not tasks_dir.is_dir():
+        sys.exit(f"No vault tasks dir at {tasks_dir} for suite '{args.suite}'")
+
+    snapshots = sorted(p for p in snapshots_root.iterdir() if p.is_dir())
+    if not snapshots:
+        sys.exit(f"No snapshot subdirs found under {snapshots_root}")
+
+    print(f"Grading {len(snapshots)} snapshots in '{args.suite}' against {vault}\n")
+    print(f"{'Task':40} {'Score':>10}  Status")
+    print(f"{'-'*40} {'-'*10}  {'-'*6}")
+
+    full_report = {
+        "suite": args.suite,
+        "vault": str(vault),
+        "snapshots": str(snapshots_root),
+        "per_task": {},
+    }
+    pass_count = 0
+    oracle_errors = []
+
+    for snap in snapshots:
+        task_id = snap.name
+        result = _grade_one(vault, args.suite, task_id, snap)
+        if result is None:
+            print(f"{task_id:40} {'-':>10}  oracle error")
+            oracle_errors.append(task_id)
+            full_report["per_task"][task_id] = {"error": "oracle parse failure"}
+            continue
+
+        score = result.get("score", 0.0)
+        mx = result.get("max_score", 1.0)
+        status = result.get("status", "fail")
+        resolved = status == "pass" and abs(score - mx) < 1e-4
+        mark = "PASS" if resolved else "FAIL"
+        if resolved:
+            pass_count += 1
+        print(f"{task_id:40} {f'{score}/{mx}':>10}  {mark}")
+        full_report["per_task"][task_id] = result
+
+    total = len(snapshots)
+    print(f"\n{pass_count}/{total} tasks PASS at full credit "
+          f"({pass_count * 100 / total:.1f}%)")
+    if oracle_errors:
+        print(f"Oracle errors: {len(oracle_errors)}")
+
+    # Per-tier / per-layer roll-up (only meaningful for ecommerce ids).
+    tier_pass = defaultdict(lambda: [0, 0])
+    layer_pass = defaultdict(lambda: [0, 0])
+    cell_pass = defaultdict(lambda: [0, 0])
+    any_known = False
+    for task_id, r in full_report["per_task"].items():
+        tier, layer = _derive_tier_layer(task_id)
+        if tier == "?":
+            continue
+        any_known = True
+        resolved = (
+            isinstance(r, dict)
+            and r.get("status") == "pass"
+            and abs(r.get("score", 0.0) - r.get("max_score", 1.0)) < 1e-4
+        )
+        tier_pass[tier][0] += int(resolved); tier_pass[tier][1] += 1
+        layer_pass[layer][0] += int(resolved); layer_pass[layer][1] += 1
+        cell_pass[(tier, layer)][0] += int(resolved); cell_pass[(tier, layer)][1] += 1
+
+    if any_known:
+        print("\nPer-tier:")
+        for t in ["T1", "T2", "T3", "T4"]:
+            if tier_pass[t][1]:
+                p_, n_ = tier_pass[t]
+                print(f"  {t}: {p_}/{n_} ({p_ * 100 / n_:.0f}%)")
+        print("\nPer-layer:")
+        for l in ["sv", "cl", "sv+cl"]:
+            if layer_pass[l][1]:
+                p_, n_ = layer_pass[l]
+                print(f"  {l:>5}: {p_}/{n_} ({p_ * 100 / n_:.0f}%)")
+        print("\n4 x 3 grid:")
+        print(f"{'':6} {'sv':>6} {'cl':>6} {'sv+cl':>6}")
+        for t in ["T1", "T2", "T3", "T4"]:
+            cells = []
+            for l in ["sv", "cl", "sv+cl"]:
+                p_, n_ = cell_pass[(t, l)]
+                cells.append(f"{p_}/{n_}" if n_ else "-")
+            print(f"{t:6} " + " ".join(c.rjust(6) for c in cells))
+
+    if args.output:
+        full_report["headline"] = {
+            "pass": pass_count,
+            "total": total,
+            "pct": round(pass_count * 100 / total, 1),
+        }
+        Path(args.output).parent.mkdir(parents=True, exist_ok=True)
+        Path(args.output).write_text(json.dumps(full_report, indent=2, default=str))
+        print(f"\nFull report: {args.output}")
+
+    sys.exit(0 if pass_count == total else 1)
+
+
+if __name__ == "__main__":
+    main()

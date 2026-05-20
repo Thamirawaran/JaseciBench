@@ -56,7 +56,7 @@ runs automatically (type-check + baseline tests). When ready, ask a
 maintainer to trigger the `grade-pr` workflow — results appear as a
 comment on your PR ~2 minutes later.
 
-Full details: [**docs/submission-guide.md**](docs/submission-guide.md)
+Full details: [**EVAL.md**](EVAL.md)
 
 ## Run the leaderboard locally
 
