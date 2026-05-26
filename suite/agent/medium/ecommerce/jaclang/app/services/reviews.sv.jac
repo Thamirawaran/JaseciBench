@@ -36,8 +36,8 @@ def:pub add_review(product_id: str, user_id: str, rating: int, title: str = "", 
         return {"error": "Product not found", "status": 404};
     }
 
-    next_num = len([root() -->][?:Review]);
-    for prod in [root() -->][?:Product] {
+    next_num = len([root -->][?:Review]);
+    for prod in [root -->][?:Product] {
         next_num = next_num + len([prod -->][?:Review]);
     }
     rid = "rev_" + str(next_num + 1).zfill(4);

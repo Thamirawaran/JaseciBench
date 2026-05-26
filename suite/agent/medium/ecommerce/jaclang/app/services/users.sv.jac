@@ -5,7 +5,7 @@ import from services.catalog { ensure_seeded }
 
 
 def find_user(user_id: str) -> UserProfile | None {
-    for u in [root() -->][?:UserProfile] {
+    for u in [root -->][?:UserProfile] {
         if u.id == user_id {
             return u;
         }
@@ -70,7 +70,7 @@ def address_dict(a: Address) -> dict {
 
 def:pub list_users() -> list[dict] {
     ensure_seeded();
-    return [user_dict(u) for u in [root() -->][?:UserProfile]];
+    return [user_dict(u) for u in [root -->][?:UserProfile]];
 }
 
 

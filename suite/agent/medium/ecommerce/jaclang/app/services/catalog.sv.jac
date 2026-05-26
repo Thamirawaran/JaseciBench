@@ -5,7 +5,7 @@ import from seed { seed_catalog }
 
 
 def ensure_seeded() -> None {
-    if not [root() -->][?:Category] {
+    if not [root -->][?:Category] {
         seed_catalog();
     }
 }
@@ -55,7 +55,7 @@ def product_dict(p: Product, include_variants: bool = True) -> dict {
 
 
 def find_variant(variant_id: str) -> Variant | None {
-    for p in [root() -->][?:Product] {
+    for p in [root -->][?:Product] {
         for v in [p -->][?:Variant] {
             if v.id == variant_id {
                 return v;
@@ -67,7 +67,7 @@ def find_variant(variant_id: str) -> Variant | None {
 
 
 def find_product(product_id: str) -> Product | None {
-    for p in [root() -->][?:Product] {
+    for p in [root -->][?:Product] {
         if p.id == product_id {
             return p;
         }
@@ -78,13 +78,13 @@ def find_product(product_id: str) -> Product | None {
 
 def:pub list_categories() -> list[dict] {
     ensure_seeded();
-    return [category_dict(c) for c in [root() -->][?:Category]];
+    return [category_dict(c) for c in [root -->][?:Category]];
 }
 
 
 def:pub list_products(category_id: str = "") -> list[dict] {
     ensure_seeded();
-    products = [root() -->][?:Product];
+    products = [root -->][?:Product];
     return [product_dict(p) for p in products if p.active];
 }
 
@@ -109,7 +109,7 @@ def:pub search_products(q: str) -> list[dict] {
     }
     q_lower = q.lower();
     matches = [];
-    for p in [root() -->][?:Product] {
+    for p in [root -->][?:Product] {
         if not p.active {
             continue;
         }

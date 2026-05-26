@@ -7,7 +7,7 @@ import from services.users { find_user, find_payment_method }
 
 
 def find_cart_item(cart_item_id: str) -> CartItem | None {
-    for ci in [root() -->][?:CartItem] {
+    for ci in [root -->][?:CartItem] {
         if ci.id == cart_item_id {
             return ci;
         }
@@ -34,7 +34,7 @@ def:pub get_cart(user_id: str) -> dict {
     ensure_seeded();
     items = [];
     total = 0.0;
-    for ci in [root() -->][?:CartItem] {
+    for ci in [root -->][?:CartItem] {
         if ci.user_id != user_id {
             continue;
         }
@@ -62,16 +62,16 @@ def:pub add_to_cart(user_id: str, variant_id: str, quantity: int = 1) -> dict {
         return {"error": "Insufficient stock", "status": 400};
     }
 
-    for ci in [root() -->][?:CartItem] {
+    for ci in [root -->][?:CartItem] {
         if ci.user_id == user_id and ci.variant_id == variant_id {
             ci.quantity = ci.quantity + quantity;
             return {"id": ci.id, "variant_id": ci.variant_id, "quantity": ci.quantity};
         }
     }
 
-    next_id = "ci_" + str(len([root() -->][?:CartItem]) + 1).zfill(3);
+    next_id = "ci_" + str(len([root -->][?:CartItem]) + 1).zfill(3);
     new_ci = CartItem(id=next_id, user_id=user_id, variant_id=variant_id, quantity=quantity);
-    root() ++> new_ci;
+    root ++> new_ci;
     return {"id": new_ci.id, "variant_id": new_ci.variant_id, "quantity": new_ci.quantity};
 }
 
@@ -106,7 +106,7 @@ def:pub remove_from_cart(cart_item_id: str) -> dict {
 
 def:pub clear_cart(user_id: str) -> dict {
     removed = 0;
-    for ci in [root() -->][?:CartItem] {
+    for ci in [root -->][?:CartItem] {
         if ci.user_id == user_id {
             del ci;
             removed = removed + 1;
@@ -137,7 +137,7 @@ def:pub checkout(
         return {"error": "Payment method not found", "status": 404};
     }
 
-    cart_items = [ci for ci in [root() -->][?:CartItem] if ci.user_id == user_id];
+    cart_items = [ci for ci in [root -->][?:CartItem] if ci.user_id == user_id];
     if not cart_items {
         return {"error": "Cart is empty", "status": 400};
     }
@@ -158,7 +158,7 @@ def:pub checkout(
         total = total + (v.price * ci.quantity);
     }
 
-    order_count = len([root() -->][?:Order]) + 1;
+    order_count = len([root -->][?:Order]) + 1;
     order_id = "W" + str(order_count).zfill(7);
     now_str = str(datetime.now());
 
@@ -174,7 +174,7 @@ def:pub checkout(
         shipping_country=shipping_country,
         created_at=now_str,
     );
-    root() ++> order;
+    root ++> order;
 
     for idx in range(len(resolved_variants)) {
         v = resolved_variants[idx];

@@ -7,7 +7,7 @@ import from services.users { find_payment_method }
 
 
 def find_order(order_id: str) -> Order | None {
-    for o in [root() -->][?:Order] {
+    for o in [root -->][?:Order] {
         if o.id == order_id {
             return o;
         }
@@ -82,7 +82,7 @@ def find_order_item(o: Order, oi_id: str) -> OrderItem | None {
 
 def:pub list_orders(user_id: str = "") -> list[dict] {
     ensure_seeded();
-    orders = [root() -->][?:Order];
+    orders = [root -->][?:Order];
     if user_id {
         orders = [o for o in orders if o.user_id == user_id];
     }

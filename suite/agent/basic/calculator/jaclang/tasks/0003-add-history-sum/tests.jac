@@ -3,7 +3,7 @@
 import from server.compute { SumHistory, ClearHistory }
 
 test "sum_history returns zero for empty history" {
-    root() spawn ClearHistory();
-    out = root() spawn SumHistory();
+    root spawn ClearHistory();
+    out = root spawn SumHistory();
     assert out.total == 0.0;
 }
