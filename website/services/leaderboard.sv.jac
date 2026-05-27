@@ -41,11 +41,11 @@ def _flatten(d: dict, prefix: str, out: dict) {
 
 def load_submissions_from_disk {
     global submissions_cache;
-    root = _data_root();
+    data_root = _data_root();
     layers = ["model", "agent", "app"];
     submissions_cache = {};
     for layer in layers {
-        layer_dir = root / layer;
+        layer_dir = data_root / layer;
         rows = [];
         if layer_dir.is_dir() {
             for p in sorted(layer_dir.iterdir()) {
