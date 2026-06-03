@@ -1,59 +1,266 @@
 #!/usr/bin/env python3
 """
-jasecibench grade-isolated: per-task local grading.
+jasecibench grade-isolated: per-task ISOLATED-mode grading.
 
-Grades a directory of per-task snapshots (produced by the runner's
-isolated mode) against the vault's hidden tests + scoring rubric. Prints
-a per-task PASS/FAIL table and per-tier / per-layer roll-ups.
+Grades a set of per-task snapshots (produced by the runner's isolated
+mode) against the vault's hidden tests + scoring rubric, then prints a
+per-task PASS/FAIL table and per-tier / per-layer roll-ups.
 
-Unlike `scripts/grade` (which dispatches the vault's grading workflow
-for a single cumulative-state SHA), this runs entirely locally and needs
-a clone of JaseciBench-vault on disk.
+Two modes
+---------
+remote (default)
+    Dispatches the vault's `grade-isolated` workflow, polls until it
+    finishes, and prints the score table from the run log. Grading
+    happens inside the vault's private Actions, so NO vault clone is
+    needed and the hidden tests never leave the vault. This is the path
+    candidates use. Your snapshots must already be committed and pushed
+    to your repo at the graded SHA (see "Snapshot layout" below).
 
-Usage
------
-    ./scripts/grade-isolated \\
-        --snapshots /tmp/snapshots \\
-        --suite     medium/ecommerce/jaclang \\
-        --vault     ~/vault \\
-        [--output   /tmp/grades.json]
+local (--local)
+    Runs the oracle directly against snapshot dirs on disk. Requires a
+    clone of JaseciBench-vault (--vault). Maintainers only -- candidates
+    cannot run this because the vault is private.
 
-Layout expected
----------------
+Snapshot layout (both modes)
+----------------------------
     snapshots/
-      0001-cart-total/
-        main.jac
-        services/
+      0001-cart-total/        <- an app root: main.jac, services/, ...
         ...
       0002-cancel-order/
         ...
+    Each subdir name is a vault task id; each subdir is the snapshot the
+    runner wrote for that one task.
 
-Each subdir must look like an app/ root (the snapshot the runner wrote).
-The vault must be checked out at --vault and must contain the matching
-tasks/agent/<suite>/ directories.
+Usage
+-----
+    # remote (no vault clone; snapshots pushed to your repo):
+    JASECIBENCH_EVAL_TOKEN=ghp_xxx ./scripts/grade-isolated \\
+        --suite medium/ecommerce/jaclang \\
+        [--repo OWNER/REPO] [--sha SHA] [--snapshots-path snapshots]
+
+    # local (maintainers, with a vault clone on disk):
+    ./scripts/grade-isolated --local \\
+        --suite     medium/ecommerce/jaclang \\
+        --snapshots /tmp/snapshots \\
+        --vault     ~/vault \\
+        [--output   /tmp/grades.json]
+
+Required environment variable (remote mode)
+    JASECIBENCH_EVAL_TOKEN
+        Fine-grained PAT scoped to JaseciBench-vault with:
+          - Actions: write   (to trigger workflow_dispatch)
+          - Actions: read    (to poll run status + fetch logs)
+        Same token as scripts/grade. `Contents: read` is NOT needed here:
+        the vault's own internal token checks out your snapshots.
+        Ask a maintainer for one -- do NOT commit this token anywhere.
 """
 
 import argparse
+import datetime
 import json
 import os
 import subprocess
 import sys
+import time
 from collections import defaultdict
 from pathlib import Path
 
+VAULT_REPO   = "Thamirawaran/JaseciBench-vault"
+WORKFLOW     = "grade-isolated.yml"
+POLL_SECS    = 8      # seconds between status polls
+MAX_POLLS    = 75     # 75 x 8s = 10 minutes max
+FIND_RETRIES = 12     # retries finding the new run after dispatch
+RESULTS_START = "---JASECIBENCH-ISOLATED-RESULTS-START---"
+RESULTS_END   = "---JASECIBENCH-ISOLATED-RESULTS-END---"
 
-def _grade_one(vault: Path, app_key: str, task_id: str, snapshot: Path) -> dict | None:
+_LAYER = {"1": "sv", "2": "cl", "3": "sv+cl"}
+
+
+# --------------------------------------------------------------------------
+# shared helpers
+# --------------------------------------------------------------------------
+
+def _run(cmd, env=None, check=True):
+    return subprocess.run(
+        cmd, capture_output=True, text=True, check=check, env=env or os.environ,
+    )
+
+
+def _gh(args, token, check=True):
+    env = {**os.environ, "GH_TOKEN": token}
+    return _run(["gh"] + args, env=env, check=check)
+
+
+def _git_sha():
+    try:
+        return _run(["git", "rev-parse", "HEAD"]).stdout.strip()
+    except subprocess.CalledProcessError:
+        sys.exit("Not inside a git repo. Pass --sha explicitly.")
+
+
+def _git_repo():
+    try:
+        url = _run(["git", "remote", "get-url", "origin"]).stdout.strip()
+    except subprocess.CalledProcessError:
+        sys.exit("No git remote 'origin'. Pass --repo explicitly.")
+    if "github.com/" in url:
+        return url.split("github.com/")[-1].removesuffix(".git").removesuffix("/")
+    if "github.com:" in url:
+        return url.split("github.com:")[-1].removesuffix(".git")
+    sys.exit(f"Cannot parse GitHub owner/repo from remote URL: {url}\nPass --repo explicitly.")
+
+
+# --------------------------------------------------------------------------
+# remote mode (default): dispatch the vault workflow, poll, print
+# --------------------------------------------------------------------------
+
+def _dispatch(token, head_repo, head_sha, suite, snapshots_path):
+    # workflow_dispatch requires a JSON body (not -F form fields) so the
+    # nested "inputs" object is serialised correctly.
+    payload = json.dumps({
+        "ref": "main",
+        "inputs": {
+            "pr_number": "0",
+            "head_sha": head_sha,
+            "head_repo": head_repo,
+            "suite": suite,
+            "snapshots_path": snapshots_path,
+        },
+    })
+    env = {**os.environ, "GH_TOKEN": token}
+    result = subprocess.run(
+        ["gh", "api",
+         f"repos/{VAULT_REPO}/actions/workflows/{WORKFLOW}/dispatches",
+         "-X", "POST", "--input", "-"],
+        input=payload, capture_output=True, text=True, env=env,
+    )
+    if result.returncode != 0:
+        sys.exit(
+            f"Dispatch failed:\n{result.stderr}\n"
+            f"Check that JASECIBENCH_EVAL_TOKEN has Actions:write on {VAULT_REPO}."
+        )
+
+
+def _find_run(token, after_ts):
+    for attempt in range(FIND_RETRIES):
+        time.sleep(5)
+        result = _gh(
+            ["run", "list", "--repo", VAULT_REPO, "--workflow", WORKFLOW,
+             "--limit", "5", "--json", "databaseId,createdAt,status"],
+            token, check=False,
+        )
+        if result.returncode != 0:
+            continue
+        for r in json.loads(result.stdout):
+            # createdAt is like "2026-04-30T10:05:00Z"
+            if r["createdAt"] >= after_ts:
+                return r["databaseId"]
+        if attempt < FIND_RETRIES - 1:
+            print("  Waiting for workflow to appear in the queue...", flush=True)
+    sys.exit(
+        "Could not find the dispatched run. "
+        f"Check https://github.com/{VAULT_REPO}/actions manually."
+    )
+
+
+def _poll(token, run_id):
+    print(f"  Polling run {run_id} ...", flush=True)
+    for _ in range(MAX_POLLS):
+        time.sleep(POLL_SECS)
+        result = _gh(
+            ["run", "view", str(run_id), "--repo", VAULT_REPO,
+             "--json", "status,conclusion"],
+            token, check=False,
+        )
+        if result.returncode != 0:
+            continue
+        data = json.loads(result.stdout)
+        if data["status"] == "completed":
+            return data["conclusion"]
+        print("  ...", flush=True)
+    sys.exit("Timed out after 10 minutes. Check the vault Actions tab.")
+
+
+def _fetch_log(token, run_id):
+    return _gh(["run", "view", str(run_id), "--repo", VAULT_REPO, "--log"],
+               token, check=False).stdout
+
+
+def _print_results(raw_log, run_id):
+    inside = found = False
+    for line in raw_log.splitlines():
+        # Log lines are "JOB\tSTEP\tTIMESTAMP CONTENT" -- take the last segment.
+        parts = line.split("\t", 2)
+        content = parts[-1] if len(parts) >= 2 else line
+        # Strip the leading timestamp (e.g. "2026-04-30T10:05:01.123Z ").
+        if "Z " in content:
+            content = content[content.index("Z ") + 2:]
+        content = content.rstrip()
+        # Match markers by EQUALITY, not membership: `shell: python` echoes the
+        # script source to the log, and the source line print("...START...")
+        # contains the marker text -- a membership test trips on it and leaks
+        # source lines. The real marker prints alone on its own line.
+        if content.strip() == RESULTS_START:
+            inside = found = True
+            continue
+        if content.strip() == RESULTS_END:
+            inside = False
+            continue
+        if inside:
+            print(content)
+    if not found:
+        print(
+            f"\n(Result markers not found in log. "
+            f"View full run: https://github.com/{VAULT_REPO}/actions/runs/{run_id})"
+        )
+
+
+def run_remote(args):
+    token = os.environ.get("JASECIBENCH_EVAL_TOKEN")
+    if not token:
+        sys.exit(
+            "JASECIBENCH_EVAL_TOKEN is not set.\n"
+            "Ask a maintainer for a fine-grained PAT with Actions:write on JaseciBench-vault.\n"
+            "(Or grade on disk with: ./scripts/grade-isolated --local --vault PATH ...)"
+        )
+
+    head_repo = args.repo or _git_repo()
+    head_sha  = args.sha  or _git_sha()
+
+    print("\nJaseciBench isolated grade (remote)")
+    print(f"  candidate : {head_repo} @ {head_sha[:12]}")
+    print(f"  suite     : {args.suite}")
+    print(f"  snapshots : {args.snapshots_path}/ (in candidate repo at SHA)")
+    print(f"  vault     : {VAULT_REPO}\n")
+
+    after_ts = datetime.datetime.now(datetime.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S")
+
+    print("Dispatching isolated grading workflow ...", flush=True)
+    _dispatch(token, head_repo, head_sha, args.suite, args.snapshots_path)
+
+    run_id = _find_run(token, after_ts)
+    print(f"Run found: https://github.com/{VAULT_REPO}/actions/runs/{run_id}", flush=True)
+
+    conclusion = _poll(token, run_id)
+
+    print("\n--- Results ---")
+    _print_results(_fetch_log(token, run_id), run_id)
+
+    print(f"\nConclusion: {conclusion}")
+    sys.exit(0 if conclusion == "success" else 1)
+
+
+# --------------------------------------------------------------------------
+# local mode (--local): run the oracle on disk (maintainers only)
+# --------------------------------------------------------------------------
+
+def _grade_one(vault, app_key, task_id, snapshot):
     """Run the oracle on one snapshot. Returns parsed JSON or None on parse failure."""
     proc = subprocess.run(
         ["jac", "run", "oracle/score.jac", "--",
-         "--app", app_key,
-         "--task", task_id,
-         "--codebase", str(snapshot),
-         "--vault", str(vault)],
-        cwd=str(vault),
-        capture_output=True,
-        text=True,
-        timeout=600,
+         "--app", app_key, "--task", task_id,
+         "--codebase", str(snapshot), "--vault", str(vault)],
+        cwd=str(vault), capture_output=True, text=True, timeout=600,
     )
     raw = (proc.stdout or "") + "\n" + (proc.stderr or "")
     js = raw.find("{")
@@ -65,10 +272,7 @@ def _grade_one(vault: Path, app_key: str, task_id: str, snapshot: Path) -> dict 
         return None
 
 
-_LAYER = {"1": "sv", "2": "cl", "3": "sv+cl"}
-
-
-def _derive_tier_layer(task_id: str) -> tuple[str, str]:
+def _derive_tier_layer(task_id):
     """Tier and layer from the leading 4-digit task id.
 
     Shared JaseciBench format: <tier_digit><layer_digit><sequence_NN>.
@@ -83,15 +287,11 @@ def _derive_tier_layer(task_id: str) -> tuple[str, str]:
     return f"T{tier_digit}", _LAYER[layer_digit]
 
 
-def main() -> None:
-    p = argparse.ArgumentParser(description="Grade JaseciBench isolated snapshots locally.")
-    p.add_argument("--snapshots", required=True, help="Directory of per-task snapshots.")
-    p.add_argument("--suite", required=True,
-                   help="Suite key matching vault layout, e.g. medium/ecommerce/jaclang.")
-    p.add_argument("--vault", required=True, help="Path to a JaseciBench-vault clone.")
-    p.add_argument("--output", default=None,
-                   help="Optional path to write the full grade report as JSON.")
-    args = p.parse_args()
+def run_local(args):
+    if not args.snapshots:
+        sys.exit("--local requires --snapshots DIR")
+    if not args.vault:
+        sys.exit("--local requires --vault PATH (a JaseciBench-vault clone)")
 
     snapshots_root = Path(args.snapshots).resolve()
     vault = Path(args.vault).resolve()
@@ -200,6 +400,37 @@ def main() -> None:
         print(f"\nFull report: {args.output}")
 
     sys.exit(0 if pass_count == total else 1)
+
+
+def main():
+    p = argparse.ArgumentParser(
+        description="Grade JaseciBench isolated-mode snapshots "
+                    "(remote via vault Actions by default; --local for on-disk).",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    p.add_argument("--suite", required=True,
+                   help="Suite key matching vault layout, e.g. medium/ecommerce/jaclang.")
+    p.add_argument("--local", action="store_true",
+                   help="Grade on disk instead of dispatching the vault workflow "
+                        "(maintainers only; requires --vault).")
+    # remote-mode options
+    p.add_argument("--repo", help="[remote] GitHub owner/repo of candidate code "
+                                  "(default: git remote origin).")
+    p.add_argument("--sha", help="[remote] Commit SHA carrying the snapshots/ tree "
+                                 "(default: current HEAD).")
+    p.add_argument("--snapshots-path", dest="snapshots_path", default="snapshots",
+                   help="[remote] Path to the snapshots dir inside the candidate repo.")
+    # local-mode options
+    p.add_argument("--snapshots", help="[local] Directory of per-task snapshots on disk.")
+    p.add_argument("--vault", help="[local] Path to a JaseciBench-vault clone.")
+    p.add_argument("--output", default=None,
+                   help="[local] Optional path to write the full grade report as JSON.")
+    args = p.parse_args()
+
+    if args.local:
+        run_local(args)
+    else:
+        run_remote(args)
 
 
 if __name__ == "__main__":

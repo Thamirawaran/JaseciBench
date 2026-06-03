@@ -3,16 +3,21 @@ name: grade-pr
 # Maintainer-triggered hidden evaluation of a pull request.
 #
 # Run from the Actions tab: pick "grade-pr", "Run workflow", enter the
-# PR number. This workflow resolves the PR's head ref, fires a
-# repository_dispatch into the private vault, and posts a "queued"
-# comment on the PR. Final scores are posted by the vault's
-# grade-submission workflow when grading completes.
+# PR number, and choose a grading mode. This resolves the PR's head ref,
+# fires repository_dispatch into the private vault, and posts a "queued"
+# comment on the PR. Final scores are posted by the vault's grading
+# workflow(s) when grading completes.
 #
-# Grading model: bulk PR. The agent's PR contains their fixes for any
-# subset of the task suite (one PR per agent, not per task). The vault
-# grader runs all tasks' hidden tests against the PR head and posts a
-# per-task results table. Tasks the agent did not fix remain in the
-# bug state baked into the public base, so their tests fail.
+# Grading modes:
+#   cumulative -> vault grade-submission.yml (event_type grade-pr): the
+#                 PR head's single app tree graded against every task.
+#                 Tasks the agent did not fix remain in the bug state
+#                 baked into the public base, so their tests fail.
+#   isolated   -> vault grade-isolated.yml (event_type grade-isolated):
+#                 per-task snapshots under snapshots/<task_id>/ at the PR
+#                 head, each graded against only its matching task.
+#                 Requires the `suite` input.
+#   both       -> fire both (two result comments will be posted).
 #
 # Why workflow_dispatch and not auto-on-PR: only users with write
 # access to this repo can trigger workflow_dispatch, which keeps
@@ -25,6 +30,25 @@ on:
         description: "PR number to grade"
         required: true
         type: string
+      mode:
+        description: "Grading mode"
+        required: true
+        type: choice
+        options:
+          - cumulative
+          - isolated
+          - both
+        default: cumulative
+      suite:
+        description: "Suite key for isolated mode, e.g. medium/ecommerce/jaclang"
+        required: false
+        type: string
+        default: medium/ecommerce/jaclang
+      snapshots_path:
+        description: "Path to the snapshots/ dir in the PR head (isolated mode)"
+        required: false
+        type: string
+        default: snapshots
 
 permissions:
   pull-requests: write
@@ -51,22 +75,59 @@ jobs:
           echo "repo=$head_repo" >> "$GITHUB_OUTPUT"
           echo "Resolved PR #${{ inputs.pr_number }} -> $head_repo @ $head_sha"
 
-      - name: Dispatch grading job to vault
+      - name: Validate inputs
+        env:
+          MODE: ${{ inputs.mode }}
+          SUITE: ${{ inputs.suite }}
+        run: |
+          set -euo pipefail
+          if [ "$MODE" = "isolated" ] || [ "$MODE" = "both" ]; then
+            [ -n "$SUITE" ] || { echo "::error::mode '$MODE' requires a 'suite' input"; exit 1; }
+          fi
+
+      - name: Dispatch cumulative grading to vault
+        if: ${{ inputs.mode == 'cumulative' || inputs.mode == 'both' }}
         env:
           GH_TOKEN: ${{ secrets.JASECIBENCH_VAULT_DISPATCH_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_SHA: ${{ steps.pr.outputs.sha }}
+          HEAD_REPO: ${{ steps.pr.outputs.repo }}
         run: |
           set -euo pipefail
           gh api repos/Thamirawaran/JaseciBench-vault/dispatches \
             -X POST \
             -F event_type=grade-pr \
-            -F "client_payload[pr_number]=${{ inputs.pr_number }}" \
-            -F "client_payload[head_sha]=${{ steps.pr.outputs.sha }}" \
-            -F "client_payload[head_repo]=${{ steps.pr.outputs.repo }}"
+            -F "client_payload[pr_number]=$PR_NUMBER" \
+            -F "client_payload[head_sha]=$HEAD_SHA" \
+            -F "client_payload[head_repo]=$HEAD_REPO"
+
+      - name: Dispatch isolated grading to vault
+        if: ${{ inputs.mode == 'isolated' || inputs.mode == 'both' }}
+        env:
+          GH_TOKEN: ${{ secrets.JASECIBENCH_VAULT_DISPATCH_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_SHA: ${{ steps.pr.outputs.sha }}
+          HEAD_REPO: ${{ steps.pr.outputs.repo }}
+          SUITE: ${{ inputs.suite }}
+          SNAPSHOTS_PATH: ${{ inputs.snapshots_path }}
+        run: |
+          set -euo pipefail
+          gh api repos/Thamirawaran/JaseciBench-vault/dispatches \
+            -X POST \
+            -F event_type=grade-isolated \
+            -F "client_payload[pr_number]=$PR_NUMBER" \
+            -F "client_payload[head_sha]=$HEAD_SHA" \
+            -F "client_payload[head_repo]=$HEAD_REPO" \
+            -F "client_payload[suite]=$SUITE" \
+            -F "client_payload[snapshots_path]=$SNAPSHOTS_PATH"
 
       - name: Acknowledge on PR
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ inputs.pr_number }}
+          HEAD_SHA: ${{ steps.pr.outputs.sha }}
+          MODE: ${{ inputs.mode }}
         run: |
-          gh pr comment ${{ inputs.pr_number }} \
+          gh pr comment "$PR_NUMBER" \
             --repo ${{ github.repository }} \
-            --body "Hidden evaluation queued for \`${{ steps.pr.outputs.sha }}\`. Results will appear here when grading completes (~2 min)."
+            --body "Hidden evaluation queued (mode: \`$MODE\`) for \`$HEAD_SHA\`. Results will appear here when grading completes (~2 min)."
