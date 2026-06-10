@@ -1,0 +1,29 @@
+{
+  "stack": "fastapi-react",
+  "fullstack": true,
+  "api_base_url": "http://127.0.0.1:8000",
+  "app_base_url": "http://127.0.0.1:5173",
+  "transport": {
+    "style": "rest",
+    "note": "Each operationId maps to the REST method+path below (FastAPI backend). Path params interpolate into the URL; body params go in the JSON body; query params in the query string. Set operation_id= on each route. The React UI at app_base_url is what the interaction journeys drive.",
+    "default_method": null
+  },
+  "auth": {
+    "mechanism": "app_bearer_token",
+    "session": "header",
+    "note": "Auth is implemented by the app. The harness registers via the register operation, logs in to receive a token, then sends 'Authorization: Bearer <token>' on authenticated API calls. The UI stores the token and guards protected pages.",
+    "register": { "via": "operation", "method": "POST", "path": "/auth/signup" },
+    "login":    { "via": "operation", "method": "POST", "path": "/auth/login", "token_field": "token", "header": "Authorization", "format": "Bearer {token}" }
+  },
+  "operations": {
+    "health":           { "method": "GET",    "path": "/health",                  "auth": false },
+    "list_products":    { "method": "GET",    "path": "/products",                "auth": false },
+    "get_product":      { "method": "GET",    "path": "/products/{product_id}",   "auth": false },
+    "get_cart":         { "method": "GET",    "path": "/cart",                    "auth": true },
+    "add_to_cart":      { "method": "POST",   "path": "/cart/items",              "auth": true },
+    "remove_from_cart": { "method": "DELETE", "path": "/cart/items/{variant_id}", "auth": true },
+    "checkout":         { "method": "POST",   "path": "/checkout",                "auth": true },
+    "list_orders":      { "method": "GET",    "path": "/orders",                  "auth": true },
+    "get_order":        { "method": "GET",    "path": "/orders/{order_id}",       "auth": true }
+  }
+}

@@ -1,0 +1,228 @@
+openapi: 3.0.3
+info:
+  title: Mini E-Commerce - Logical Contract
+  version: "0.1"
+  description: >
+    Stack-neutral logical contract for the ecommerce-mini AppAgentEval task.
+    This covers DOMAIN operations only. Registration and login are NOT here: auth
+    is each stack's native mechanism (token in app code for FastAPI; runtime
+    session for Jac) and is provided by the harness via adapters/<stack>.json.
+    Operations are identified by operationId; the concrete route for each is
+    resolved per stack via the adapter. Request/response schemas, status codes,
+    and state effects are identical across stacks; only transport may differ.
+    A `security: bearerAuth` marker means "requires the stack's authenticated
+    session", however that session is realised on that stack.
+
+paths:
+  /health:
+    get:
+      operationId: health
+      summary: Liveness check.
+      responses:
+        "200": { description: App is up. }
+
+  /products:
+    get:
+      operationId: list_products
+      summary: List active products.
+      parameters:
+        - { name: limit, in: query, required: false, schema: { type: integer, minimum: 1 } }
+        - { name: offset, in: query, required: false, schema: { type: integer, minimum: 0 } }
+      responses:
+        "200":
+          description: Active products.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ProductList" }
+
+  /products/{product_id}:
+    get:
+      operationId: get_product
+      summary: Get one product with its variants (active or not).
+      parameters:
+        - { name: product_id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: The product.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Product" }
+        "404": { description: Unknown product. }
+
+  # NOTE: registration and login are intentionally NOT domain operations.
+  # They are each stack's native auth, performed by the harness via the adapter's
+  # `auth` block. Endpoints below marked `security: bearerAuth` require that
+  # authenticated session.
+
+  /cart:
+    get:
+      operationId: get_cart
+      summary: Current user's cart.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Cart.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+        "401": { description: Missing/invalid token. }
+
+  /cart/items:
+    post:
+      operationId: add_to_cart
+      summary: Add a variant to the cart.
+      security: [{ bearerAuth: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                variant_id: { type: string }
+                quantity: { type: integer, minimum: 1 }
+              required: [variant_id, quantity]
+      responses:
+        "200":
+          description: Updated cart.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+        "400": { description: quantity < 1 or unknown variant. }
+        "401": { description: Missing/invalid token. }
+
+  /cart/items/{variant_id}:
+    delete:
+      operationId: remove_from_cart
+      summary: Remove a variant from the cart.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: variant_id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Updated cart.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Cart" }
+        "401": { description: Missing/invalid token. }
+
+  /checkout:
+    post:
+      operationId: checkout
+      summary: Create a persisted order from the cart and empty the cart.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "201":
+          description: Order created.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "400": { description: Empty cart. }
+        "401": { description: Missing/invalid token. }
+
+  /orders:
+    get:
+      operationId: list_orders
+      summary: Current user's orders.
+      security: [{ bearerAuth: [] }]
+      responses:
+        "200":
+          description: Orders.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  orders:
+                    type: array
+                    items: { $ref: "#/components/schemas/Order" }
+                required: [orders]
+        "401": { description: Missing/invalid token. }
+
+  /orders/{order_id}:
+    get:
+      operationId: get_order
+      summary: Get one of the current user's orders.
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: order_id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: The order.
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Order" }
+        "401": { description: Missing/invalid token. }
+        "404": { description: Not the user's order or unknown. }
+
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer }
+  schemas:
+    Credentials:
+      type: object
+      properties:
+        email: { type: string }
+        password: { type: string }
+      required: [email, password]
+    Variant:
+      type: object
+      properties:
+        id: { type: string }
+        price: { type: number }
+        color: { type: string }
+        size: { type: string }
+        stock_qty: { type: integer }
+      required: [id, price]
+    Product:
+      type: object
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        active: { type: boolean }
+        variants:
+          type: array
+          items: { $ref: "#/components/schemas/Variant" }
+      required: [id, name, active]
+    ProductList:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/Product" }
+      required: [items]
+    CartLine:
+      type: object
+      properties:
+        variant_id: { type: string }
+        quantity: { type: integer }
+        price: { type: number }
+        subtotal: { type: number }
+      required: [variant_id, quantity, price, subtotal]
+    Cart:
+      type: object
+      properties:
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/CartLine" }
+        total: { type: number }
+      required: [items, total]
+    OrderItem:
+      type: object
+      properties:
+        variant_id: { type: string }
+        quantity: { type: integer }
+        unit_price: { type: number }
+      required: [variant_id, quantity, unit_price]
+    Order:
+      type: object
+      properties:
+        id: { type: string }
+        total: { type: number }
+        status: { type: string }
+        created_at: { type: string }
+        items:
+          type: array
+          items: { $ref: "#/components/schemas/OrderItem" }
+      required: [id, total, status]
