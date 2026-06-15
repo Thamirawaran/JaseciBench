@@ -2,7 +2,8 @@
   "stack": "fastapi-react",
   "fullstack": true,
   "api_base_url": "http://127.0.0.1:8000",
-  "app_base_url": "http://127.0.0.1:5173",
+  "app_base_url": "http://127.0.0.1:8000",
+  "note_fullstack": "The reference serves the UI from FastAPI on the same origin as the API (app_base_url == api_base_url). A submission that runs a separate React dev/preview server (e.g. on 5173) sets its own app_base_url.",
   "transport": {
     "style": "rest",
     "note": "Each operationId maps to the REST method+path below (FastAPI backend). Path params interpolate into the URL; body params go in the JSON body; query params in the query string. Set operation_id= on each route. The React UI at app_base_url is what the interaction journeys drive.",

@@ -1,9 +1,9 @@
 {
   "stack": "jac",
   "fullstack": true,
-  "api_base_url": "http://127.0.0.1:8000",
+  "api_base_url": "http://127.0.0.1:8001",
   "app_base_url": "http://127.0.0.1:8000",
-  "note_fullstack": "Jac serves the UI (cl frontend) and the API (def:pub/def:priv endpoints) from the same origin via `jac start`, so app_base_url == api_base_url.",
+  "note_fullstack": "Full-stack Jac runs via `jac start main.jac --dev -p <ui> -a <api>`: the Vite dev server serves the cl UI on the UI port (app_base_url) and the API (def:pub/def:priv endpoints, /user auth) on a separate API port (api_base_url), with Vite proxying RPC. Backend-only contract runs can instead use `jac start main.jac -n` on a single port.",
   "transport": {
     "style": "rpc",
     "note": "Every domain operationId is a def:pub/def:priv function reached at POST /function/<operationId>. Path/query/body params are all sent in the JSON body keyed by parameter name.",
