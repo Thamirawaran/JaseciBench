@@ -1,4 +1,4 @@
-# Layer 3 — AppAgentEval
+# Layer 3: AppAgentEval
 
 **Question answered**: How good is the *delivered* application? Given a
 stack-neutral spec (a `design.md`), the agent builds a complete full-stack

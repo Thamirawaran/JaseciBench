@@ -26,6 +26,10 @@ solutions (those live in the vault).
 4. **Keep tasks realistic and multi-step.** A task must be auditable against a
    trivial/shortcut solver before inclusion (Online-Mind2Web lesson). State-
    dependent flows (e.g. "an order must actually persist") are preferred.
+5. **No em dashes or en dashes.** In any authored content (specs, guides, docs,
+   code comments), use a colon, semicolon, comma, or parentheses instead. A plain
+   hyphen is fine for ranges and compound words. This is a repo-wide rule (see
+   CONTRIBUTING).
 
 ## Required sections
 
