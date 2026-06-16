@@ -128,6 +128,30 @@ can return an inactive product by id.
 - **Accessibility**: the catalogue page targets a Lighthouse accessibility score
   of at least 80.
 
+## 8b. UI Contract (data-testid)
+
+The delivered app must include a browsable UI for the core flow, and that UI must
+expose these stable `data-testid` attributes so automated user-journeys can drive
+it (the UI counterpart of the API contract):
+
+- **Auth screen**: a logged-out visitor must land on (or be able to reach in one
+  obvious step) a single auth view that exposes `email`, `password`, `signup`, and
+  `login` together. The journey signs up and then logs in from this one screen, so
+  these four controls must coexist on the logged-out auth view, not be split across
+  separate, separately-navigated pages. If the auth view is not the initial page,
+  the entry point to it must itself carry a `data-testid` of `nav-login`.
+- `email`, `password`: the credential inputs.
+- `signup`, `login`: the auth buttons. `auth-msg`: a status line that reads
+  `registered` after a successful sign up.
+- `nav-catalogue`, `nav-cart`, `nav-orders`: navigation to each view (shown once
+  logged in).
+- `add-<variant_id>` (for example `add-v3`): the add-to-cart button on each
+  variant in the catalogue.
+- `cart-total`: an element whose text contains the cart total (for example
+  `Total: $29`). `checkout`: the checkout button.
+- `order-count`: text containing the number of orders (for example `Orders: 1`).
+  `order-total`: an element per order whose text contains that order's total.
+
 ## 9. Out of Scope
 No real payment gateway (checkout just records the order), no email, no admin
 panel, no product search, no reviews, no shipping/address management. Building
