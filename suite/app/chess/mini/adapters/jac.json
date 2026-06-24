@@ -1,0 +1,36 @@
+{
+  "stack": "jac",
+  "fullstack": true,
+  "api_base_url": "http://127.0.0.1:8001",
+  "app_base_url": "http://127.0.0.1:8000",
+  "note_fullstack": "Full-stack Jac runs via `jac start main.jac --dev -p <ui> -a <api>`: the Vite dev server serves the cl UI on the UI port (app_base_url) and the API (def:pub/def:priv endpoints, /user auth) on a separate API port (api_base_url), with Vite proxying RPC. Backend-only contract runs can instead use `jac start main.jac -n` on a single port.",
+  "transport": {
+    "style": "rpc",
+    "note": "Every domain operationId is a def:pub/def:priv function reached at POST /function/<operationId>. Path/query/body params are all sent in the JSON body keyed by parameter name (e.g. game_id, uci, opponent, fen, limit, offset).",
+    "endpoint_template": "/function/{operationId}",
+    "default_method": "POST"
+  },
+  "auth": {
+    "mechanism": "jac_runtime_token",
+    "session": "bearer",
+    "note": "Auth is provided by the Jac runtime (jac start), not by an app endpoint. Register at /user/register, log in at /user/login to receive data.token (a JWT), then send 'Authorization: Bearer <token>' on def:priv operations. Identity is {type:email,value:<email>}, credential is {type:password,password:<pw>}; emails must use a real domain (.local is rejected by the runtime).",
+    "register": { "via": "runtime", "method": "POST", "path": "/user/register" },
+    "login":    { "via": "runtime", "method": "POST", "path": "/user/login", "token_path": "data.token", "header": "Authorization", "format": "Bearer {token}" }
+  },
+  "response": {
+    "envelope": "data.result",
+    "status_from": "meta.extra.http_status",
+    "unauthorized": "error.code == UNAUTHORIZED -> 401",
+    "app_error_convention": "a function may return {\"error\": <msg>, \"status\": <N>} for a logical 4xx (e.g. an illegal move returns status 400); the harness maps that to the status",
+    "note": "Jac wraps every function result in an envelope; the harness unwraps data.result and normalises the status. Reference functions return plain dicts (not raw nodes) so the wire shape matches the contract exactly."
+  },
+  "operations": {
+    "health":      { "path": "/function/health",      "auth": false },
+    "create_game": { "path": "/function/create_game", "auth": true },
+    "list_games":  { "path": "/function/list_games",  "auth": true },
+    "get_game":    { "path": "/function/get_game",    "auth": true },
+    "list_moves":  { "path": "/function/list_moves",  "auth": true },
+    "make_move":   { "path": "/function/make_move",   "auth": true },
+    "resign":      { "path": "/function/resign",      "auth": true }
+  }
+}
