@@ -1,0 +1,150 @@
+openapi: 3.0.3
+info:
+  title: Mini Chess - logical domain contract
+  version: "0.1"
+  description: >
+    Logical contract for chess-mini. operationIds are the stable contract; the
+    per-stack adapter (adapters/<stack>.json) maps each operationId to a concrete
+    route + transport + auth. Board state is FEN; moves are UCI. Register and login
+    are NOT here: they use the stack's native auth via the adapter.
+
+components:
+  schemas:
+    Move:
+      type: object
+      properties:
+        ply: { type: integer }
+        color: { type: string, enum: [white, black] }
+        uci: { type: string, example: e2e4 }
+        fen_after: { type: string }
+    Game:
+      type: object
+      properties:
+        id: { type: string }
+        white_user: { type: string, description: stable user id of the White player }
+        black_user: { type: string, description: stable user id of the Black player }
+        fen: { type: string, example: "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1" }
+        turn: { type: string, enum: [white, black] }
+        status: { type: string, enum: [active, checkmate, stalemate, draw] }
+        check: { type: boolean }
+        winner: { type: string, nullable: true, enum: [white, black, null] }
+        moves:
+          type: array
+          items: { $ref: '#/components/schemas/Move' }
+    Error:
+      type: object
+      properties:
+        error: { type: string }
+
+  responses:
+    Unauthorized:
+      description: missing or invalid token
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    BadRequest:
+      description: illegal move or invalid input
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+    Forbidden:
+      description: caller is not a player in this game
+      content: { application/json: { schema: { $ref: '#/components/schemas/Error' } } }
+
+paths:
+  /games:
+    post:
+      operationId: create_game
+      summary: Create a game vs a named opponent (auth).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [opponent]
+              properties:
+                opponent: { type: string, description: registered opponent's user id (becomes Black) }
+                fen: { type: string, description: "optional starting FEN; defaults to the standard start position" }
+      responses:
+        "201": { description: created, content: { application/json: { schema: { $ref: '#/components/schemas/Game' } } } }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+    get:
+      operationId: list_games
+      summary: List the caller's games (auth).
+      parameters:
+        - { name: limit, in: query, required: false, schema: { type: integer } }
+        - { name: offset, in: query, required: false, schema: { type: integer } }
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  games: { type: array, items: { $ref: '#/components/schemas/Game' } }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+
+  /games/{game_id}:
+    get:
+      operationId: get_game
+      summary: Get one game's full state (auth; players only).
+      parameters:
+        - { name: game_id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Game' } } } }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+
+  /games/{game_id}/moves:
+    get:
+      operationId: list_moves
+      summary: List a game's move history (auth; players only).
+      parameters:
+        - { name: game_id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: ok
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  moves: { type: array, items: { $ref: '#/components/schemas/Move' } }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+    post:
+      operationId: make_move
+      summary: Play a legal UCI move on your turn (auth). Returns the updated game.
+      parameters:
+        - { name: game_id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [uci]
+              properties:
+                uci: { type: string, example: e2e4 }
+      responses:
+        "200": { description: applied, content: { application/json: { schema: { $ref: '#/components/schemas/Game' } } } }
+        "400": { $ref: '#/components/responses/BadRequest' }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+
+  /games/{game_id}/resign:
+    post:
+      operationId: resign
+      summary: Resign the game; the opponent wins (auth; players only).
+      parameters:
+        - { name: game_id, in: path, required: true, schema: { type: string } }
+      responses:
+        "200": { description: ok, content: { application/json: { schema: { $ref: '#/components/schemas/Game' } } } }
+        "401": { $ref: '#/components/responses/Unauthorized' }
+        "403": { $ref: '#/components/responses/Forbidden' }
+
+  /health:
+    get:
+      operationId: health
+      summary: Liveness check.
+      responses:
+        "200": { description: up }

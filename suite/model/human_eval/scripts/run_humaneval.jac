@@ -182,8 +182,14 @@ def grade_jac(program: str, timeout: int = 60) -> tuple {
         f = Path(d) / "task.jac";
         f.write_text(program);
         try {
+            # JAC_TEST_NATIVE=1: serial native runner. jaclang 0.30.2 defaults
+            # `jac test` to parallel pytest (xdist), whose cold-start worker
+            # races make grading nondeterministic; the native runner is
+            # deterministic (and returncode-correct on failure).
+            env: dict[str, str] = dict(os.environ);
+            env["JAC_TEST_NATIVE"] = "1";
             p = subprocess.run(["jac", "test", str(f)], capture_output=True,
-                               text=True, timeout=timeout, cwd=d);
+                               text=True, timeout=timeout, cwd=d, env=env);
         } except subprocess.TimeoutExpired {
             return (False, "timeout");
         }

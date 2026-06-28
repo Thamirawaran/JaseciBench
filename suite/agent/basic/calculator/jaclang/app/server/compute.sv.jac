@@ -54,7 +54,7 @@ walker:priv Compute {
         );
         if new_calc {
             self.saved_id = new_id;
-            report _to_dict(new_calc[0]);
+            report _to_dict(new_calc);
         }
     }
 }

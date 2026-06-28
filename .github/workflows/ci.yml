@@ -9,6 +9,13 @@ on:
   push:
   pull_request:
 
+env:
+  # Deterministic grading: jaclang 0.30.2 defaults `jac test` to parallel
+  # pytest (xdist), whose cold-start worker processes race the first creation
+  # of the per-app graph store -> first-run-only flaky failures. The native
+  # serial test runner is race-free. Applies to every job below.
+  JAC_TEST_NATIVE: "1"
+
 jobs:
   calculator-baseline:
     name: "calculator app: type check + baseline tests"
@@ -20,10 +27,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install jaclang
+      - name: Install Jac (native binary)
+        # Latest Jac (0.30.x) ships only as the self-contained native binary,
+        # not on PyPI, so install via the official script rather than pip.
         run: |
-          python -m pip install --upgrade pip
-          pip install "jaclang>=0.14"
+          curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: jac check main.jac
         working-directory: suite/agent/basic/calculator/jaclang/app
@@ -43,10 +52,12 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install jaclang
+      - name: Install Jac (native binary)
+        # Latest Jac (0.30.x) ships only as the self-contained native binary,
+        # not on PyPI, so install via the official script rather than pip.
         run: |
-          python -m pip install --upgrade pip
-          pip install "jaclang>=0.14"
+          curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Install npm deps (jac install)
         working-directory: suite/agent/medium/ecommerce/jaclang/app
