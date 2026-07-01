@@ -28,8 +28,9 @@ node Widget {
     has name: str;
     has price: float = 0.0;
 }
-# create + commit (reachable from root => persisted)
-w = (root ++> Widget(name="Bolt", price=2.5))[0];
+# create + commit (reachable from root => persisted).
+# `++>` to a single node returns that node (not a list), so no [0] unwrap.
+w = root ++> Widget(name="Bolt", price=2.5);
 # read all widgets
 all = [root -->][?:Widget];
 # filter / count
@@ -54,7 +55,7 @@ def:pub list_widgets() -> list[Widget] {
     return [root -->][?:Widget];
 }
 def:pub add_widget(name: str, price: float) -> Widget {
-    return (root ++> Widget(name=name, price=price))[0];
+    return root ++> Widget(name=name, price=price);
 }
 ```
 Return type IS the wire format; give every endpoint an explicit `-> T`. Use a

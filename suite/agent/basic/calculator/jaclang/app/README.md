@@ -6,10 +6,12 @@ This is the codebase the JacAgentBench-v0.1 tasks operate on. Don't change anyth
 
 ## Run it locally
 
-Requires conda env with `jaclang>=0.14`.
+Requires Jac 0.30+ (the self-contained native binary; not on PyPI) plus the
+server plugin. Install jac (see the repo root README), then
+`jac install jac-scale --global`.
 
 ```bash
-conda activate jacenv
+# native jac binary is on PATH; no venv activation needed
 
 # Type-check the whole app
 jac check main.jac

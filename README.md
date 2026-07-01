@@ -66,7 +66,8 @@ jac install
 jac start main.jac   # opens at http://localhost:8000
 ```
 
-Requires Python 3.12+ and `jaclang>=0.14` (`pip install jaclang`).
+Requires Jac 0.30+, installed as the self-contained native binary (it is not on
+PyPI): `curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash`.
 
 ## License
 
