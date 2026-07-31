@@ -1,8 +1,8 @@
 """E-commerce app entry point.
 
-Server endpoints (def:pub) are registered here, then the client section
-opens with `to cl:` and mounts the `Shell` component. Seeding happens
-lazily on first endpoint call (services.catalog.ensure_seeded).
+Server endpoints (def:pub) are registered here; the `cl` block below mounts
+the `Shell` component client-side. Seeding happens lazily on first endpoint
+call (services.catalog.ensure_seeded).
 """
 
 import from seed { seed_catalog }
@@ -21,11 +21,10 @@ import from services.orders {
 
 cl import "./global.css";
 
-to cl:
+cl {
+    import from .frontend { Shell }
 
-import from .frontend { Shell }
-
-
-def:pub app() -> JsxElement {
-    return <Shell />;
+    def:pub app() -> JsxElement {
+        return <Shell />;
+    }
 }

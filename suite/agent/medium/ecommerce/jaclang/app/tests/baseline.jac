@@ -263,7 +263,7 @@ test "list_reviews returns empty for product with no reviews" {
 test "product_review_summary returns average + count for prod_001" {
     s = product_review_summary("prod_001");
     assert s["count"] == 2;
-    assert abs(s["average_rating"] - 4.5) < 0.01;
+    assert abs((s["average_rating"] as float) - 4.5) < 0.01;
 }
 
 

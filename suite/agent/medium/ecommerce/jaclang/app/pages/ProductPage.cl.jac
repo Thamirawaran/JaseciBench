@@ -12,14 +12,14 @@ def:pub ProductPage() -> JsxElement {
     has feedback: str = "";
 
     params = useParams();
-    pid = params["id"];
+    pid: str = params["id"] as str;
 
     async can with entry {
         result = await get_product(pid);
         product = result;
         loading = False;
         if product != None and len(product["variants"]) > 0 {
-            selected_variant_id = product["variants"][0]["id"];
+            selected_variant_id = product["variants"][0]["id"] as str;
         }
     }
 
@@ -61,16 +61,16 @@ def:pub ProductPage() -> JsxElement {
                     <div className="space-y-2">
                         {[<button
                             key={v["id"]}
-                            onClick={lambda _e: MouseEvent { selected_variant_id = v["id"]; }}
+                            onClick={lambda (_e: MouseEvent) { selected_variant_id = v["id"] as str; }}
                             className={"w-full text-left p-3 rounded-lg border transition-colors " + ("border-indigo-600 bg-indigo-50" if selected_variant_id == v["id"] else "border-gray-200 hover:border-gray-300")}
                         >
                             <div className="flex items-center justify-between">
                                 <div>
                                     <div className="text-sm font-medium text-gray-900">
-                                        {v["color"] + " · " + v["size"]}
+                                        {(v["color"] as str) + " · " + (v["size"] as str)}
                                     </div>
                                     <div className="text-xs text-gray-500 mt-0.5">
-                                        {v["material"] + " · " + str(v["stock_qty"]) + " in stock"}
+                                        {(v["material"] as str) + " · " + str(v["stock_qty"]) + " in stock"}
                                     </div>
                                 </div>
                                 <span className="text-sm font-bold text-gray-900">

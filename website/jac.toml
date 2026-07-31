@@ -1,10 +1,12 @@
 [project]
 name = "jasecibench-leaderboard"
+jac-version = "==0.34.8"
 version = "0.1.0"
 description = "JaseciBench leaderboard — fullstack Jac application. Renders Home / Leaderboard / Methodology / Submit pages backed by JSON files in leaderboard-data/."
 entry-point = "main.jac"
 
 [dependencies.npm]
+"@tanstack/react-form" = "^1.0.0"
 react = "^18.2.0"
 react-dom = "^18.2.0"
 react-router-dom = "^6.22.0"
@@ -29,10 +31,10 @@ watchdog = ">=3.0.0"
 [serve]
 base_route_app = "app"
 
-[plugins.client.vite]
+[client.vite]
 plugins = ["tailwindcss()"]
 lib_imports = ["import tailwindcss from '@tailwindcss/vite'"]
 
-[plugins.client.app_meta_data]
+[client.app_meta_data]
 title = "JaseciBench — Leaderboard for LLMs and coding agents on Jac"
 description = "Public benchmark suite evaluating models, coding agents, and app-builder agents on Jac and the Jaseci stack across three layers."

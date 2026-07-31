@@ -27,7 +27,7 @@ def:pub SearchPage() -> JsxElement {
             <input
                 type="text"
                 value={query}
-                onChange={lambda e: ChangeEvent { query = e.target.value; }}
+                onChange={lambda (e: ChangeEvent) { query = e.target.value; }}
                 placeholder="Try 'shirt', 'coffee', 'wireless'..."
                 className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:border-indigo-600 focus:ring-2 focus:ring-indigo-100"
             />

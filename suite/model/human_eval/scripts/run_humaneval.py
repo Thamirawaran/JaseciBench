@@ -174,7 +174,7 @@ def grade_jac(program: str, timeout: int = 60) -> tuple[bool, str]:
         f = Path(d) / "task.jac"
         f.write_text(program, encoding="utf-8")
         try:
-            # JAC_TEST_NATIVE=1: serial native runner. jaclang 0.30.2 defaults
+            # JAC_TEST_NATIVE=1: serial native runner. jaclang 0.34.8 defaults
             # `jac test` to parallel pytest (xdist), whose cold-start worker
             # races make grading nondeterministic; the native runner is
             # deterministic (and returncode-correct on failure).

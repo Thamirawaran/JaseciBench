@@ -63,7 +63,7 @@ def:pub app -> JsxElement {
                     type="text"
                     value={username}
                     placeholder="Username"
-                    onChange={lambda e: ChangeEvent { username = e.target.value; }}
+                    onChange={lambda (e: ChangeEvent) { username = e.target.value; }}
                     style={{
                         "width": "100%",
                         "padding": "0.5rem",
@@ -78,7 +78,7 @@ def:pub app -> JsxElement {
                     type="password"
                     value={password}
                     placeholder="Password"
-                    onChange={lambda e: ChangeEvent { password = e.target.value; }}
+                    onChange={lambda (e: ChangeEvent) { password = e.target.value; }}
                     style={{
                         "width": "100%",
                         "padding": "0.5rem",
@@ -93,7 +93,7 @@ def:pub app -> JsxElement {
                 <div style={{"display": "flex", "gap": "0.5rem"}}>
                     <button
                         data-testid="auth-login"
-                        onClick={lambda _e: MouseEvent { handle_login(); }}
+                        onClick={lambda (_e: MouseEvent) { handle_login(); }}
                         disabled={auth_busy}
                         style={{
                             "flex": "1",
@@ -109,7 +109,7 @@ def:pub app -> JsxElement {
                     </button>
                     <button
                         data-testid="auth-signup"
-                        onClick={lambda _e: MouseEvent { handle_signup(); }}
+                        onClick={lambda (_e: MouseEvent) { handle_signup(); }}
                         disabled={auth_busy}
                         style={{
                             "flex": "1",
@@ -158,7 +158,7 @@ def:pub app -> JsxElement {
                 <h2 style={{"margin": "0"}}>Calculator</h2>
                 <button
                     data-testid="auth-logout"
-                    onClick={lambda _e: MouseEvent { handle_logout(); }}
+                    onClick={lambda (_e: MouseEvent) { handle_logout(); }}
                     style={{
                         "padding": "0.25rem 0.75rem",
                         "background": "#f3f4f6",
@@ -182,7 +182,7 @@ def:pub app -> JsxElement {
             <div style={{"marginTop": "1rem"}}>
                 <button
                     data-testid="history-toggle"
-                    onClick={lambda _e: MouseEvent {
+                    onClick={lambda (_e: MouseEvent) {
                         history_visible = not history_visible;
                     }}
                     style={{
@@ -199,7 +199,7 @@ def:pub app -> JsxElement {
                 </button>
                 {(<button
                     data-testid="history-clear"
-                    onClick={lambda _e: MouseEvent { clear_history(); }}
+                    onClick={lambda (_e: MouseEvent) { clear_history(); }}
                     style={{
                         "padding": "0.375rem 0.75rem",
                         "background": "#fee2e2",

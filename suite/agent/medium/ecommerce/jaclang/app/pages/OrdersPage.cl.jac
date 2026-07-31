@@ -38,7 +38,7 @@ def:pub OrdersPage() -> JsxElement {
                         <div className="text-sm font-bold text-gray-900">{o["id"]}</div>
                         <div className="text-xs text-gray-500 mt-0.5">{o["created_at"]}</div>
                         <div className="text-xs text-gray-600 mt-2">
-                            {o["shipping_address1"] + ", " + o["shipping_city"] + ", " + o["shipping_state"] + " " + o["shipping_zip"]}
+                            {(o["shipping_address1"] as str) + ", " + (o["shipping_city"] as str) + ", " + (o["shipping_state"] as str) + " " + (o["shipping_zip"] as str)}
                         </div>
                     </div>
                     <div className="flex flex-col items-end gap-2">
@@ -46,7 +46,7 @@ def:pub OrdersPage() -> JsxElement {
                             {o["status"]}
                         </span>
                         {(<button
-                            onClick={lambda _e: MouseEvent { do_cancel(o["id"]); }}
+                            onClick={lambda (_e: MouseEvent) { do_cancel(o["id"] as str); }}
                             className="text-xs text-red-600 hover:text-red-700 hover:underline"
                         >Cancel</button>) if o["status"] in ["pending", "processed"] else None}
                     </div>

@@ -20,7 +20,7 @@ def:pub Segmented(
         <div className="inline-flex items-center gap-1 p-1 rounded-lg border border-zinc-200 bg-white">
             {[<button
                 key={opt[0]}
-                onClick={lambda _e: MouseEvent { on_change(opt[0]); }}
+                onClick={lambda (_e: MouseEvent) { on_change(opt[0]); }}
                 className={(
                     "rounded-md px-3.5 py-1.5 text-sm font-medium transition-colors "
                     + (

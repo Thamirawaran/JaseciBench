@@ -17,7 +17,7 @@ def:pub Key(label: str, kind: str, on_press: any) -> JsxElement {
     return
         <button
             data-testid={"calc-key-" + label}
-            onClick={lambda _e: MouseEvent { on_press(); }}
+            onClick={lambda (_e: MouseEvent) { on_press(); }}
             style={{
                 "padding": "1rem",
                 "fontSize": "1.125rem",
@@ -63,7 +63,7 @@ def:pub Keypad(
             /> for o in ops]}
             <button
                 data-testid="calc-key-equals"
-                onClick={lambda _e: MouseEvent { on_equals(); }}
+                onClick={lambda (_e: MouseEvent) { on_equals(); }}
                 style={{
                     "padding": "1rem",
                     "fontSize": "1.125rem",
@@ -80,7 +80,7 @@ def:pub Keypad(
             </button>
             <button
                 data-testid="calc-key-clear"
-                onClick={lambda _e: MouseEvent { on_clear(); }}
+                onClick={lambda (_e: MouseEvent) { on_clear(); }}
                 style={{
                     "padding": "1rem",
                     "fontSize": "1.125rem",
