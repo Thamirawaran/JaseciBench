@@ -40,7 +40,6 @@ def _flatten(d: dict, prefix: str, out: dict) {
 
 
 def load_submissions_from_disk {
-    global submissions_cache;
     data_root = _data_root();
     layers = ["model", "agent", "app"];
     submissions_cache = {};

@@ -10,7 +10,7 @@ on:
   pull_request:
 
 env:
-  # Deterministic grading: jaclang 0.30.2 defaults `jac test` to parallel
+  # Deterministic grading: jaclang 0.34.8 defaults `jac test` to parallel
   # pytest (xdist), whose cold-start worker processes race the first creation
   # of the per-app graph store -> first-run-only flaky failures. The native
   # serial test runner is race-free. Applies to every job below.
@@ -28,10 +28,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install Jac (native binary)
-        # Latest Jac (0.30.x) ships only as the self-contained native binary,
-        # not on PyPI, so install via the official script rather than pip.
+        # Jac ships only as the self-contained native binary (not on PyPI), so
+        # install via the official script rather than pip. Pinned to 0.34.8 to
+        # match [project].jac-version in every app's jac.toml.
         run: |
-          curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash
+          curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash -s -- --version 0.34.8
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: jac check main.jac
@@ -53,10 +54,11 @@ jobs:
           python-version: "3.12"
 
       - name: Install Jac (native binary)
-        # Latest Jac (0.30.x) ships only as the self-contained native binary,
-        # not on PyPI, so install via the official script rather than pip.
+        # Jac ships only as the self-contained native binary (not on PyPI), so
+        # install via the official script rather than pip. Pinned to 0.34.8 to
+        # match [project].jac-version in every app's jac.toml.
         run: |
-          curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash
+          curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash -s -- --version 0.34.8
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Install npm deps (jac install)

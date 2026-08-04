@@ -47,7 +47,7 @@ def:pub CartPage() -> JsxElement {
         return <div className="max-w-4xl mx-auto px-6 py-12 text-gray-500">Loading...</div>;
     }
 
-    items = cart["items"] if cart else [];
+    items: list[dict] = (cart["items"] as list[dict]) if cart else [];
 
     return <div className="max-w-4xl mx-auto px-6 py-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Shopping Cart</h1>
@@ -60,7 +60,7 @@ def:pub CartPage() -> JsxElement {
                     </div>
                     <div className="flex-1 min-w-0">
                         <div className="text-sm font-semibold text-gray-900">
-                            {item["color"] + " · " + item["size"]}
+                            {(item["color"] as str) + " · " + (item["size"] as str)}
                         </div>
                         <div className="text-xs text-gray-500 mt-0.5">
                             {"$" + str(item["price"]) + " each"}
@@ -68,17 +68,17 @@ def:pub CartPage() -> JsxElement {
                     </div>
                     <div className="flex items-center gap-2">
                         <button
-                            onClick={lambda _e: MouseEvent { update_qty(item["id"], item["quantity"] - 1); }}
+                            onClick={lambda (_e: MouseEvent) { update_qty(item["id"] as str, (item["quantity"] as int) - 1); }}
                             className="w-8 h-8 rounded border border-gray-300 hover:bg-gray-50 text-gray-600"
                         >−</button>
                         <span className="w-8 text-center text-sm font-medium">{item["quantity"]}</span>
                         <button
-                            onClick={lambda _e: MouseEvent { update_qty(item["id"], item["quantity"] + 1); }}
+                            onClick={lambda (_e: MouseEvent) { update_qty(item["id"] as str, (item["quantity"] as int) + 1); }}
                             className="w-8 h-8 rounded border border-gray-300 hover:bg-gray-50 text-gray-600"
                         >+</button>
                     </div>
                     <button
-                        onClick={lambda _e: MouseEvent { remove_item(item["id"]); }}
+                        onClick={lambda (_e: MouseEvent) { remove_item(item["id"] as str); }}
                         className="text-gray-400 hover:text-red-600 text-sm"
                     >Remove</button>
                 </div> for item in items]}

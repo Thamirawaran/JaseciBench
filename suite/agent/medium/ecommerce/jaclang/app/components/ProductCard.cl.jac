@@ -5,7 +5,7 @@ import from "@jac/runtime" { Link }
 
 def:pub ProductCard(product: Any) -> JsxElement {
     return <Link
-        to={"/products/" + product["id"]}
+        to={"/products/" + (product["id"] as str)}
         className="group block bg-white border border-gray-200 rounded-xl p-4 hover:border-indigo-300 hover:shadow-md transition-all"
     >
         <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-50 rounded-lg mb-3 flex items-center justify-center text-gray-300 text-2xl font-light">
@@ -19,7 +19,7 @@ def:pub ProductCard(product: Any) -> JsxElement {
         </p>
         <div className="mt-3 flex items-center justify-between">
             <span className="text-xs text-gray-400">
-                {str(len(product["variants"])) + " variants"}
+                {str(len(product["variants"] as list)) + " variants"}
             </span>
         </div>
     </Link>;

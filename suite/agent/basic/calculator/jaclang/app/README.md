@@ -6,9 +6,9 @@ This is the codebase the JacAgentBench-v0.1 tasks operate on. Don't change anyth
 
 ## Run it locally
 
-Requires Jac 0.30+ (the self-contained native binary; not on PyPI) plus the
-server plugin. Install jac (see the repo root README), then
-`jac install jac-scale --global`.
+Requires Jac 0.34.8 (the self-contained native binary; not on PyPI), pinned via
+`[project].jac-version` in jac.toml. Install jac (see the repo root README);
+the server runtime ships inside the binary, so no plugin install is needed.
 
 ```bash
 # native jac binary is on PATH; no venv activation needed

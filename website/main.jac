@@ -1,7 +1,7 @@
 """JaseciBench leaderboard — full-stack entry point.
 
-Server is the default context — endpoints/imports go at the top with
-no section header. `to cl:` opens the client section that follows.
+Server is the default context: endpoints/imports go at the top with no
+section header. The `cl` block below holds the client entry.
 
 The `with entry` block runs once at server startup and populates the
 in-memory submissions cache from leaderboard-data/.
@@ -13,12 +13,12 @@ with entry {
     load_submissions_from_disk();
 }
 
-to cl:
+cl import "./styles/global.css";
 
-import "./styles/global.css";
+cl {
+    import from components.AppShell { AppShell }
 
-import from components.AppShell { AppShell }
-
-def:pub app -> JsxElement {
-    return <AppShell />;
+    def:pub app -> JsxElement {
+        return <AppShell />;
+    }
 }

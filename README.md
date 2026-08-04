@@ -66,7 +66,8 @@ jac install
 jac start main.jac   # opens at http://localhost:8000
 ```
 
-Requires Jac 0.30+, installed as the self-contained native binary (it is not on
+Requires Jac 0.34.8 (pinned via `[project].jac-version` in each app's jac.toml),
+installed as the self-contained native binary (it is not on
 PyPI): `curl -fsSL https://raw.githubusercontent.com/jaseci-labs/jaseci/main/scripts/install.sh | bash`.
 
 ## License

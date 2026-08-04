@@ -191,7 +191,7 @@ def:pub modify_order_items(order_id: str, changes: list[dict]) -> dict {
     }
 
     for change in changes {
-        oi_id = change["order_item_id"];
+        oi_id: str = change["order_item_id"] as str;
         new_variant_id = change["new_variant_id"] if "new_variant_id" in change else "";
         new_quantity = change["new_quantity"] if "new_quantity" in change else 0;
 

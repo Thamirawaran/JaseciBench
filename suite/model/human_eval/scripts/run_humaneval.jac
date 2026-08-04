@@ -182,7 +182,7 @@ def grade_jac(program: str, timeout: int = 60) -> tuple {
         f = Path(d) / "task.jac";
         f.write_text(program);
         try {
-            # JAC_TEST_NATIVE=1: serial native runner. jaclang 0.30.2 defaults
+            # JAC_TEST_NATIVE=1: serial native runner. jaclang 0.34.8 defaults
             # `jac test` to parallel pytest (xdist), whose cold-start worker
             # races make grading nondeterministic; the native runner is
             # deterministic (and returncode-correct on failure).
@@ -284,11 +284,11 @@ def run_lang(lang: str, client: any, provider: str, model: str, limit: int,
     if lang == "jac" {
         items = sorted(
             [p for p in Path(JAC_DIR).glob("HumanEval_*.jac")],
-            key=lambda p: any : int(p.stem.split("_")[1]),
+            key=lambda (p: any) { int(p.stem.split("_")[1]); },
         );
     } else {
         items = load_python_tasks();
-        items = sorted(items, key=lambda r: dict : int(r["task_id"].split("/")[1]));
+        items = sorted(items, key=lambda (r: dict) { int(r["task_id"].split("/")[1]); });
     }
     if limit {
         items = items[:limit];
@@ -331,7 +331,7 @@ def run_lang(lang: str, client: any, provider: str, model: str, limit: int,
     summary = {
         "lang": lang, "model": model, "metric": "pass@1 (greedy)",
         "total": total, "passed": passed, "pass@1": rate,
-        "results": sorted(results, key=lambda r: dict : r["task"]),
+        "results": sorted(results, key=lambda (r: dict) { r["task"]; }),
     };
     (out_dir / ("report_" + lang + ".json")).write_text(json.dumps(summary, indent=2));
     print(f"[{lang}] pass@1 = {passed}/{total} = {rate:.1%}", flush=True);

@@ -1,10 +1,12 @@
 [project]
 name = "jacbench-calculator"
+jac-version = "==0.34.8"
 version = "0.1.0"
 description = "Reference Jaseci application for JacAgentBench-v0.1 (Calculator). Full-stack: walkers + nodes on the server, JSX components on the client."
 entry-point = "main.jac"
 
 [dependencies.npm]
+"@tanstack/react-form" = "^1.0.0"
 react = "^18.2.0"
 react-dom = "^18.2.0"
 react-router-dom = "^6.22.0"
@@ -26,4 +28,4 @@ watchdog = ">=3.0.0"
 [serve]
 base_route_app = "app"
 
-[plugins.client]
+[client]

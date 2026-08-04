@@ -5,7 +5,6 @@ import from .models { Calculation }
 glob calc_counter: int = 0;
 
 def _next_id -> str {
-    global calc_counter;
     calc_counter += 1;
     return "calc_" + str(calc_counter);
 }
