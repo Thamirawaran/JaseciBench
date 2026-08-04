@@ -1,6 +1,6 @@
 """HumanEval model-eval runner, written in Jac.
 
-A Jac port of run_humaneval.py: prompt a model, splice its completion, grade it.
+Prompt a model, splice its completion into the task, and grade it.
 pass@1 (greedy), two languages from the SAME 164 underlying HumanEval tasks:
 
   - jac     : tasks in ../jaclang/HumanEval_*.jac (bodyless `def ...;` + a
@@ -27,9 +27,15 @@ import tempfile;
 import from pathlib { Path }
 import from concurrent.futures { ThreadPoolExecutor, as_completed }
 
-glob REPO_ROOT: str = "/Users/thami/Documents/Work/repo";
-glob JAC_DIR: str = REPO_ROOT + "/official/JaseciBench/suite/model/human_eval/jaclang";
-glob DATASET: str = REPO_ROOT + "/JaseciBenchmark-dev/layer1-model/humaneval-jac/data/HumanEval.jsonl.gz";
+# Everything is resolved from this file's own location so the runner works on
+# any checkout. The Python HumanEval dataset is not vendored (licence + size),
+# so `--lang python|both` needs HUMANEVAL_DATASET pointing at HumanEval.jsonl.gz;
+# `--lang jac` is self-contained and needs nothing.
+glob HERE: Path = Path(__file__).resolve().parent;
+glob SUITE: Path = HERE.parent;
+glob REPO_ROOT: str = str(SUITE.parents[2]);
+glob JAC_DIR: str = str(SUITE / "jaclang");
+glob DATASET: str = os.environ.get("HUMANEVAL_DATASET", "");
 glob TEST_HEADER: str = 'test "Check candidate function"';
 
 glob JAC_SYSTEM: str =
@@ -224,6 +230,16 @@ def run_jac_task(client: any, provider: str, model: str, path: any,
 # PYTHON
 # --------------------------------------------------------------------------- #
 def load_python_tasks() -> list {
+    if not DATASET {
+        raise SystemExit(
+            "--lang python/both needs the upstream HumanEval dataset, which is "
+            "not vendored here. Set HUMANEVAL_DATASET to a HumanEval.jsonl.gz "
+            "(from openai/human-eval), or use --lang jac, which is self-contained."
+        );
+    }
+    if not Path(DATASET).is_file() {
+        raise SystemExit(f"HUMANEVAL_DATASET does not exist: {DATASET}");
+    }
     return [json.loads(l) for l in gzip.open(DATASET, "rt")];
 }
 
