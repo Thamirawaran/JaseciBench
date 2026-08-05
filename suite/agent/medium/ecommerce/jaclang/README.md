@@ -15,9 +15,11 @@ conventions, and quick-start.
 
 ## Status
 
-- 🚧 Base app: in progress (porting from JaseciBenchmark experimental)
-- 🚧 Tasks: Jac-specific task descriptions coming next
-- 🚧 Vault tasks (`broken/`, `solution/`, `tests_hidden.jac`): coming next
+- ✅ Base app: complete. Type-checks and passes its 32 baseline tests.
+- ✅ Tasks: 120 published, one `issue.md` each, across the 4x3 grid.
+- ✅ Vault: a reference solution for all 120 and hidden tests for 119. The
+  remaining task is graded by `source_contains` alone, so it ships no hidden
+  test. Every reference solution is swept in CI and must score 1.0 / 1.0.
 
 ## Pairs with
 
