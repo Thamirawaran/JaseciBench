@@ -17,10 +17,10 @@ act on; the comparison is full-stack vs full-stack.
 - [`adapters/<stack>.json`](adapters/) - operationId -> route map, plus the auth mechanism and the api/app base URLs, for the chosen stack.
 - `../../guides/<stack>.md` - the normalised full-stack design guide.
 
-## What grades it (in JaseciBenchmark-vault, hidden)
-`JaseciBenchmark-vault/tasks/app/ecommerce/mini/`:
+## What grades it (in JaseciBench-vault, hidden)
+`JaseciBench-vault/tasks/app/ecommerce/mini/`:
 - `requirements.yaml` - the requirement graph (hard requirements + preferences + dependency edges).
-- `acceptance/contract_tests.py` - stack-neutral golden tests that hit the running app via the adapter.
+- `acceptance/contract_tests.jac` - stack-neutral golden tests that hit the running app via the adapter.
 - `acceptance/journeys.md` - golden user-journey specs (Playwright).
 - `scoring.json` - layer weights and gates (function-gates-polish).
 - `solution/<stack>/` - reference builds.

@@ -64,9 +64,9 @@ The `.jac` runner additionally hardcodes `JAC_DIR` from it, while the `.py`
 runner at least derives `HERE`/`SUITE` from `__file__`. Neither works on any
 other checkout without editing source, in a repository that is public.
 
-Both also point `DATASET` at `JaseciBenchmark-dev/layer1-model/...`, a path that
-does not exist in a clean `official/` checkout, so `--lang python` and
-`--lang both` fail with `FileNotFoundError`. Only `--lang jac` is self-contained.
+Both also pointed `DATASET` at a path outside this repository, which does not
+exist in a clean checkout, so `--lang python` and `--lang both` failed with
+`FileNotFoundError`. Only `--lang jac` was self-contained.
 
 Fixed: `HERE`, `SUITE`, `JAC_DIR` and `REPO_ROOT` are now derived from
 `Path(__file__).resolve().parent` (`__file__` works in Jac). The runner resolves

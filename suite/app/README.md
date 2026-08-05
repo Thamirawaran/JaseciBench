@@ -61,27 +61,21 @@ Tasks are grouped by app domain (`ecommerce/`), with complexity variants under i
 `fastapi-react`), so each delivers UI + API + persistence; the comparison is
 full-stack vs full-stack. The hidden oracle for each task (requirement graph,
 golden tests, reference solutions, scoring config) lives in
-`JaseciBenchmark-vault/tasks/app/<domain>/<variant>/`.
+`JaseciBench-vault/tasks/app/<domain>/<variant>/`.
 
 ## Status
 
-**Planned for v0.1; Phase 0 in progress.** The `ecommerce-mini` task and the
-authoring scaffolding (schema, guides, contract, adapters) are the first
-artifacts. The illustrative entries on the leaderboard's
-`AppAgentEval` tab are sample data labelled
-`"submitted_by": "JaseciBenchmark team (illustrative)"` and will be replaced
-when the first scored run lands. The illustrative entries on the leaderboard's
-`AppAgentEval` tab are sample data labelled
-`"submitted_by": "JaseciBenchmark team (illustrative)"` and will be replaced
-when the first benchmark lands.
+**Two tasks complete: `ecommerce-mini` and `chess-mini`.** Both ship reference
+solutions for both stack columns, and all four grade a full 1.0 (objective and
+interaction) on host and in `--isolation docker`.
 
-Full pipeline architecture, scoring model, the Jac comparability-column
-design, the oracle design, harness tooling, a phased build plan, and the
-references behind all of the above are in
-[JaseciBenchmark-dev / discussion / appagenteval-pipeline-research.md](https://github.com/Thamirawaran/JaseciBenchmark-dev/blob/main/discussion/appagenteval-pipeline-research.md).
-Historical framing (the earlier feature-integration design, now superseded)
-is in
-[three-dataset-proposal.md section 4](https://github.com/Thamirawaran/JaseciBenchmark-dev/blob/main/discussion/three-dataset-proposal.md#4-appagenteval-greenfield-spec-to-app-delivery).
+The illustrative entries on the leaderboard's `AppAgentEval` tab are sample data
+labelled `"submitted_by": "JaseciBench team (illustrative)"` and will be
+replaced when the first scored run lands.
+
+The pipeline architecture, scoring model, Jac comparability-column design and
+oracle design are tracked in the private vault alongside the oracle they
+describe.
 
 ## Smallest credible first task set
 

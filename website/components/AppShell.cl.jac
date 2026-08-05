@@ -1,6 +1,6 @@
 """Top-level shell — sticky header + Router + footer.
 
-Mirrors JaseciBenchmark/website/frontend/src/components/Layout.tsx.
+Mirrors the layout of the original React website shell.
 """
 
 import from "@jac/runtime" { Router, Routes, Route, Navigate, Link, useLocation }
